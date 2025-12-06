@@ -1,0 +1,266 @@
+// prisma/schema.prisma
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ============================================
+// AUTH & USER MODELS
+// ============================================
+
+model User {
+  id                    String    @id @default(cuid())
+  email                 String    @unique
+  password              String    // bcrypt hashed
+  name                  String
+  avatar                String?   // Gravatar URL or initials
+  timezone              String    @default("UTC")
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  lastLoginAt           DateTime?
+
+  // Relations
+  activities            Activity[]
+  goals                 Goal[]
+  customCategories      CustomCategory[]
+  sessionTokens         SessionToken[]
+  notifications         Notification[]
+  preferences           UserPreferences?
+  activitySuggestions   ActivitySuggestion[]
+
+  @@index([email])
+}
+
+model SessionToken {
+  id                    String    @id @default(cuid())
+  userId                String
+  token                 String    @unique
+  expiresAt             DateTime
+  createdAt             DateTime  @default(now())
+
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model UserPreferences {
+  id                    String    @id @default(cuid())
+  userId                String    @unique
+  rememberMeEnabled     Boolean   @default(true)
+  notificationsEnabled  Boolean   @default(true)
+  categoryOrder         String[]  @default([]) // JSON array of category IDs
+  hiddenCategories      String[]  @default([]) // Categories hidden from UI
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// ============================================
+// CATEGORIES & CUSTOM CATEGORIES
+// ============================================
+
+model Category {
+  id                    String    @id @default(cuid())
+  name                  String    @unique // "Physical Health", "Career & Finances", etc.
+  description           String?
+  order                 Int       @default(0)
+  createdAt             DateTime  @default(now())
+
+  activities            Activity[]
+  goals                 Goal[]
+
+  @@index([name])
+}
+
+model CustomCategory {
+  id                    String    @id @default(cuid())
+  userId                String
+  name                  String
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  activities            Activity[]
+  goals                 Goal[]
+
+  @@unique([userId, name])
+  @@index([userId])
+}
+
+// ============================================
+// ACTIVITY MODELS
+// ============================================
+
+model Activity {
+  id                    String    @id @default(cuid())
+  userId                String
+  description           String
+  categoryId            String
+  customCategoryId      String?
+  startTime             DateTime
+  endTime               DateTime?
+  duration              Int?      // in minutes
+  confidenceScore       Float     @default(0.0) // 0-100
+  parsedData            Json?     // Raw LLM output for debugging
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category              Category  @relation(fields: [categoryId], references: [id])
+  customCategory        CustomCategory? @relation(fields: [customCategoryId], references: [id])
+
+  @@index([userId])
+  @@index([categoryId])
+  @@index([customCategoryId])
+  @@index([startTime])
+  @@index([createdAt])
+  // @@fulltext([description]) // PostgreSQL full-text search
+}
+
+model ActivitySuggestion {
+  id                    String    @id @default(cuid())
+  userId                String
+  description           String
+  categoryId            String
+  frequency             Int       @default(1) // times logged
+  lastUsed              DateTime?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([frequency])
+}
+
+// ============================================
+// GOALS
+// ============================================
+
+model Goal {
+  id                    String    @id @default(cuid())
+  userId                String
+  categoryId            String?
+  customCategoryId      String?
+  title                 String
+  goalType              String    // "frequency" (4x per week) or "duration" (10 hours per week)
+  targetValue           Int       // 4 (for 4x) or 10 (for 10 hours)
+  targetUnit            String    // "per_week", "per_month"
+  startDate             DateTime
+  endDate               DateTime?
+  status                String    @default("active") // "active", "completed", "archived"
+  progressValue         Int       @default(0)
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category              Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  customCategory        CustomCategory? @relation(fields: [customCategoryId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([categoryId])
+  @@index([status])
+}
+
+// ============================================
+// NOTIFICATIONS & ALERTS
+// ============================================
+
+model Notification {
+  id                    String    @id @default(cuid())
+  userId                String
+  type                  String    // "streak", "milestone", "goal_alert", "recommendation"
+  title                 String
+  message               String
+  actionData            Json?     // Extra context (e.g., { goalId: "..." })
+  read                  Boolean   @default(false)
+  createdAt             DateTime  @default(now())
+
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+// ============================================
+// STREAKS & MILESTONES
+// ============================================
+
+model Streak {
+  id                    String    @id @default(cuid())
+  userId                String
+  categoryId            String?
+  customCategoryId      String?
+  currentCount          Int       @default(1)
+  bestCount             Int       @default(1)
+  lastActivityDate      DateTime
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@unique([userId, categoryId, customCategoryId])
+  @@index([userId])
+}
+
+model Milestone {
+  id                    String    @id @default(cuid())
+  userId                String
+  milestoneType         String    // "logging_7day", "activities_100", "exercise_doubled", etc.
+  achieved              Boolean   @default(false)
+  achievedAt            DateTime?
+  createdAt             DateTime  @default(now())
+
+  @@index([userId])
+  @@index([achieved])
+}
+
+// ============================================
+// ANALYTICS & AGGREGATIONS
+// ============================================
+
+model DailyAggregate {
+  id                    String    @id @default(cuid())
+  userId                String
+  date                  DateTime  // date only (YYYY-MM-DD)
+  totalActivities       Int       @default(0)
+  totalDuration         Int       @default(0) // minutes
+  categoryBreakdown     Json      // { "categoryId": hours, ... }
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@unique([userId, date])
+  @@index([userId])
+  @@index([date])
+}
+
+model WeeklyAggregate {
+  id                    String    @id @default(cuid())
+  userId                String
+  weekStart             DateTime  // Monday of week
+  totalHours            Int       @default(0)
+  categoryBreakdown     Json      // { "categoryId": hours, ... }
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@unique([userId, weekStart])
+  @@index([userId])
+  @@index([weekStart])
+}
+
+// ============================================
+// SEED DATA MODELS (for demo user)
+// ============================================
+
+model DemoSeed {
+  id                    String    @id @default(cuid())
+  seedDate              DateTime  @default(now())
+  // tracks if demo data was already seeded
+}

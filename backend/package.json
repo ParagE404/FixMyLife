@@ -1,0 +1,31 @@
+{
+  "name": "habit-formation-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "AI Habit Formation App Backend",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "nodemon src/index.js",
+    "start": "node src/index.js",
+    "migrate": "prisma migrate dev",
+    "studio": "prisma studio",
+    "seed": "node src/scripts/seed.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@prisma/client": "^5.7.0",
+    "axios": "^1.6.5",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.3",
+    "prisma": "^5.7.0",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}

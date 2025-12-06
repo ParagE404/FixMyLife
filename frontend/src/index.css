@@ -1,0 +1,30 @@
+/* src/index.css */
+@import "tailwindcss";
+
+/* Optional: if you want theme vars here */
+@theme {
+  --color-primary: #2180a4;
+  --color-surface: #fffffe;
+  --color-background: #fcfcf9;
+  --color-text: #134252;
+  --color-text-secondary: #626d6d;
+}
+
+/* Your global styles */
+* {
+  @apply border-gray-200;
+}
+
+body {
+  @apply bg-background text-text font-sans;
+}
+
+button {
+  @apply transition-all duration-200;
+}
+
+input,
+textarea,
+select {
+  @apply focus:outline-none focus:ring-2 focus:ring-primary;
+}
