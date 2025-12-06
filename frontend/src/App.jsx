@@ -1,11 +1,13 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { MobileWrapper } from './components/layout/MobileWrapper';
+import { MobileNav } from './components/layout/MobileNav';
 import { PrivateRoute } from './components/layout/PrivateRoute';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { OnboardingPage } from './pages/OnboardingPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { ActivityPage } from './pages/ActivityPage';
+import { GoalsPage } from './pages/GoalsPage';
 
 function App() {
   return (
@@ -23,6 +25,14 @@ function App() {
             }
           />
           <Route
+            path="/dashboard"
+            element={
+              <PrivateRoute>
+                <DashboardPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
             path="/activities"
             element={
               <PrivateRoute>
@@ -31,15 +41,16 @@ function App() {
             }
           />
           <Route
-            path="/dashboard"
+            path="/goals"
             element={
               <PrivateRoute>
-                <DashboardPage />
+                <GoalsPage />
               </PrivateRoute>
             }
           />
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
         </Routes>
+        <MobileNav />
       </BrowserRouter>
     </MobileWrapper>
   );

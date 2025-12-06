@@ -4,6 +4,8 @@ import { config } from './config.js';
 import authRoutes from './routes/auth.routes.js';
 import userRoutes from './routes/user.routes.js';
 import activityRoutes from './routes/activity.routes.js';
+import analyticsRoutes from './routes/analytics.routes.js';
+import goalsRoutes from './routes/goals.routes.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
 const app = express();
@@ -22,6 +24,8 @@ app.get('/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/activities', activityRoutes);
+app.use('/api/analytics', analyticsRoutes);
+app.use('/api/goals', goalsRoutes);
 
 // 404 handler
 app.use((req, res) => {
