@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuthStore } from '../../stores/authStore';
+import { userService } from '../../services/user.service';
 
 const DEFAULT_CATEGORIES = [
   'Physical Health',
@@ -13,7 +15,10 @@ export function OnboardingFlow() {
   const [step, setStep] = useState(1);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [goals, setGoals] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { token, setUser } = useAuthStore();
 
   const toggleCategory = (category) => {
     setSelectedCategories((prev) =>
@@ -27,14 +32,30 @@ export function OnboardingFlow() {
     setGoals((prev) => ({ ...prev, [category]: value }));
   };
 
-  const handleComplete = () => {
-    console.log('Onboarding complete:', { selectedCategories, goals });
-    navigate('/dashboard');
+  const handleComplete = async () => {
+    try {
+      setLoading(true);
+      setError('');
+      
+      const updatedUser = await userService.completeOnboarding(selectedCategories, goals, token);
+      setUser(updatedUser);
+      
+      navigate('/dashboard');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-background">
       <div className="w-full max-w-md p-6 bg-surface rounded-lg shadow-md">
+        {error && (
+          <div className="p-3 mb-4 bg-red-100 text-red-700 rounded-lg text-sm">
+            {error}
+          </div>
+        )}
         {step === 1 ? (
           <>
             <h2 className="text-2xl font-bold mb-2">Select Your Focus Areas</h2>
@@ -97,9 +118,10 @@ export function OnboardingFlow() {
               </button>
               <button
                 onClick={handleComplete}
-                className="flex-1 py-2 bg-primary text-white rounded-lg font-medium hover:bg-opacity-90"
+                disabled={loading}
+                className="flex-1 py-2 bg-primary text-white rounded-lg font-medium hover:bg-opacity-90 disabled:opacity-50"
               >
-                Start Tracking
+                {loading ? 'Saving...' : 'Start Tracking'}
               </button>
             </div>
           </>

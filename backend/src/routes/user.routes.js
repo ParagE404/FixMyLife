@@ -7,6 +7,7 @@ import {
   updateUserPreferences,
   getDefaultCategories,
   getOrCreateCategories,
+  completeOnboarding,
 } from '../services/user.service.js';
 
 const router = express.Router();
@@ -57,6 +58,17 @@ router.get('/categories', async (req, res, next) => {
   try {
     const categories = await getDefaultCategories();
     res.json(categories);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Complete onboarding
+router.post('/complete-onboarding', authenticateUser, async (req, res, next) => {
+  try {
+    const { selectedCategories, goals } = req.body;
+    const user = await completeOnboarding(req.userId, selectedCategories, goals);
+    res.json(user);
   } catch (error) {
     next(error);
   }

@@ -95,3 +95,48 @@ export const getOrCreateCategories = async () => {
 
   return await prisma.category.findMany({ orderBy: { order: 'asc' } });
 };
+
+export const completeOnboarding = async (userId, selectedCategories, goals) => {
+  // Ensure categories exist
+  await getOrCreateCategories();
+  
+  // Get category IDs for selected categories
+  const categories = await prisma.category.findMany({
+    where: { name: { in: selectedCategories } }
+  });
+
+  // Create goals for selected categories
+  const goalPromises = categories.map(category => {
+    const goalDescription = goals[category.name];
+    if (goalDescription) {
+      return prisma.goal.create({
+        data: {
+          userId,
+          title: `${category.name} Goal`,
+          description: goalDescription,
+          targetHours: 7, // Default 1 hour per day
+          categoryId: category.id,
+          startDate: new Date(),
+          status: 'active'
+        }
+      });
+    }
+    return null;
+  }).filter(Boolean);
+
+  await Promise.all(goalPromises);
+
+  // Mark onboarding as completed
+  const user = await prisma.user.update({
+    where: { id: userId },
+    data: { onboardingCompleted: true },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      onboardingCompleted: true,
+    }
+  });
+
+  return user;
+};

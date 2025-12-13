@@ -31,6 +31,7 @@ export const registerUser = async (email, password, name) => {
       id: true,
       email: true,
       name: true,
+      onboardingCompleted: true,
       createdAt: true,
     },
   });
@@ -83,6 +84,7 @@ export const loginUser = async (email, password, rememberMe = false) => {
       id: user.id,
       email: user.email,
       name: user.name,
+      onboardingCompleted: user.onboardingCompleted,
     },
     tokens: {
       accessToken,
