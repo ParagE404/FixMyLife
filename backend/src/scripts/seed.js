@@ -59,26 +59,30 @@ async function main() {
     activityDate.setDate(activityDate.getDate() - i);
     activityDate.setHours(9, 0, 0, 0);
 
+    const workoutEndTime = new Date(activityDate.getTime() + 60 * 60 * 1000); // 1 hour
     await prisma.activity.create({
       data: {
         userId: demoUser.id,
         description: 'Morning workout',
         categoryId: physicalCategory.id,
         startTime: activityDate,
-        endTime: new Date(activityDate.getTime() + 60 * 60 * 1000),
+        endTime: workoutEndTime,
+        duration: 60, // 60 minutes
         confidenceScore: 0.95,
       },
     });
 
     const workDate = new Date(activityDate);
     workDate.setHours(10, 0, 0, 0);
+    const workEndTime = new Date(workDate.getTime() + 480 * 60 * 1000); // 8 hours
     await prisma.activity.create({
       data: {
         userId: demoUser.id,
         description: 'Work session',
         categoryId: careerCategory.id,
         startTime: workDate,
-        endTime: new Date(workDate.getTime() + 480 * 60 * 1000), // 8 hours
+        endTime: workEndTime,
+        duration: 480, // 480 minutes (8 hours)
         confidenceScore: 0.9,
       },
     });

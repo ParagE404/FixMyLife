@@ -3,6 +3,15 @@ import { throwError } from '../middleware/errorHandler.js';
 
 const prisma = new PrismaClient();
 
+// Helper function to calculate activity duration
+const getActivityDuration = (activity) => {
+  if (activity.duration) return activity.duration;
+  if (activity.endTime && activity.startTime) {
+    return Math.round((new Date(activity.endTime) - new Date(activity.startTime)) / (1000 * 60));
+  }
+  return 0;
+};
+
 // Get weekly summary for current week
 export const getWeeklySummary = async (userId) => {
   try {
@@ -27,7 +36,7 @@ export const getWeeklySummary = async (userId) => {
     const categoryTotals = {};
 
     activities.forEach((activity) => {
-      const dayKey = activity.startTime.toISOString().split('T');
+      const dayKey = activity.startTime.toISOString().split('T')[0];
       if (!dailyBreakdown[dayKey]) {
         dailyBreakdown[dayKey] = 0;
       }
@@ -37,7 +46,7 @@ export const getWeeklySummary = async (userId) => {
         categoryTotals[catName] = 0;
       }
 
-      const duration = activity.duration || 0;
+      const duration = getActivityDuration(activity);
       dailyBreakdown[dayKey] += duration / 60; // convert to hours
       categoryTotals[catName] += duration / 60;
     });
@@ -49,7 +58,7 @@ export const getWeeklySummary = async (userId) => {
     for (let i = 0; i < 7; i++) {
       const date = new Date(startOfWeek);
       date.setDate(startOfWeek.getDate() + i);
-      const dayKey = date.toISOString().split('T');
+      const dayKey = date.toISOString().split('T')[0];
       const dayName = weekDays[i];
 
       chartData.push({
@@ -100,7 +109,7 @@ export const getCategoryBreakdown = async (userId, days = 7) => {
         };
       }
 
-      const duration = activity.duration || 0;
+      const duration = getActivityDuration(activity);
       categoryData[catName].hours += duration / 60;
       categoryData[catName].count += 1;
     });
@@ -137,7 +146,7 @@ export const getFourWeekTrends = async (userId) => {
       const actDate = new Date(activity.startTime);
       const weekStart = new Date(actDate);
       weekStart.setDate(actDate.getDate() - actDate.getDay());
-      const weekKey = weekStart.toISOString().split('T');
+      const weekKey = weekStart.toISOString().split('T')[0];
 
       if (!weeklyData[weekKey]) {
         weeklyData[weekKey] = {
@@ -147,7 +156,7 @@ export const getFourWeekTrends = async (userId) => {
         };
       }
 
-      const duration = activity.duration || 0;
+      const duration = getActivityDuration(activity);
       weeklyData[weekKey].totalHours += duration / 60;
       weeklyData[weekKey].activityCount += 1;
     });
@@ -196,11 +205,11 @@ export const getCalendarHeatmap = async (userId, month = null) => {
     const heatmapData = {};
 
     activities.forEach((activity) => {
-      const dateKey = activity.startTime.toISOString().split('T');
+      const dateKey = activity.startTime.toISOString().split('T')[0];
       if (!heatmapData[dateKey]) {
         heatmapData[dateKey] = 0;
       }
-      const duration = activity.duration || 0;
+      const duration = getActivityDuration(activity);
       heatmapData[dateKey] += duration / 60; // hours
     });
 
@@ -209,7 +218,7 @@ export const getCalendarHeatmap = async (userId, month = null) => {
     const current = new Date(startDate);
 
     while (current <= endDate) {
-      const dateKey = current.toISOString().split('T');
+      const dateKey = current.toISOString().split('T')[0];
       const hours = heatmapData[dateKey] || 0;
 
       calendarData.push({
@@ -225,8 +234,8 @@ export const getCalendarHeatmap = async (userId, month = null) => {
 
     return {
       data: calendarData,
-      startDate: startDate.toISOString().split('T'),
-      endDate: endDate.toISOString().split('T'),
+      startDate: startDate.toISOString().split('T')[0],
+      endDate: endDate.toISOString().split('T')[0],
     };
   } catch (error) {
     console.error('Calendar heatmap error:', error);
@@ -359,13 +368,13 @@ export const getDailyStats = async (userId, date) => {
         categoryBreakdown[catName] = 0;
       }
 
-      const duration = activity.duration || 0;
+      const duration = getActivityDuration(activity);
       categoryBreakdown[catName] += duration / 60;
       totalHours += duration / 60;
     });
 
     return {
-      date: targetDate.toISOString().split('T'),
+      date: targetDate.toISOString().split('T')[0],
       activities,
       categoryBreakdown,
       totalHours: totalHours.toFixed(1),

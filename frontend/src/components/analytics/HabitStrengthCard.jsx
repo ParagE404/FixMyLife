@@ -64,11 +64,11 @@ export function HabitStrengthCard({ data }) {
             <p className="text-xs text-text-secondary">Days Active</p>
           </div>
           <div className="text-center">
-            <p className="text-2xl font-bold text-blue-600">{avgHoursPerDay.toFixed(1)}</p>
+            <p className="text-2xl font-bold text-blue-600">{avgHoursPerDay}</p>
             <p className="text-xs text-text-secondary">Avg Hours/Day</p>
           </div>
           <div className="text-center col-span-2">
-            <p className="text-2xl font-bold text-blue-600">{avgActivitiesPerDay.toFixed(1)}</p>
+            <p className="text-2xl font-bold text-blue-600">{avgActivitiesPerDay}</p>
             <p className="text-xs text-text-secondary">Avg Activities/Day</p>
           </div>
         </div>

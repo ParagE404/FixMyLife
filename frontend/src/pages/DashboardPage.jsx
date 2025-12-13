@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { analyticsService } from '../services/analytics.service';
 import { useAuthStore } from '../stores/authStore';
 import { WeeklyChart } from '../components/analytics/WeeklyChart';
@@ -18,11 +18,7 @@ export function DashboardPage() {
   const [habitStrength, setHabitStrength] = useState(null);
   const [calendarData, setCalendarData] = useState(null);
 
-  useEffect(() => {
-    loadDashboardData();
-  }, [token]);
-
-  const loadDashboardData = async () => {
+  const loadDashboardData = useCallback(async () => {
     try {
       setLoading(true);
       setError('');
@@ -45,7 +41,11 @@ export function DashboardPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
+
+  useEffect(() => {
+    loadDashboardData();
+  }, [loadDashboardData]);
 
   if (loading) {
     return (

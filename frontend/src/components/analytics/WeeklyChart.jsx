@@ -38,16 +38,31 @@ export function WeeklyChart({ data }) {
       <h3 className="text-lg font-semibold mb-4">Weekly Activity Hours</h3>
       <div style={{ width: '100%', height: '300px' }}>
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={chartData} margin={{ top: 20, right: 30, left: 0, bottom: 20 }}>
+          <BarChart 
+            data={chartData} 
+            margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+          >
             <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
-            <XAxis dataKey="day" stroke="#666" style={{ fontSize: '12px' }} />
-            <YAxis stroke="#666" style={{ fontSize: '12px' }} />
+            <XAxis 
+              dataKey="day" 
+              stroke="#666" 
+              style={{ fontSize: '12px' }}
+            />
+            <YAxis 
+              stroke="#666" 
+              style={{ fontSize: '12px' }}
+            />
             <Tooltip 
               contentStyle={{ backgroundColor: '#fff', border: '1px solid #ccc', borderRadius: '8px' }}
               formatter={(value) => `${parseFloat(value).toFixed(1)}h`}
             />
             <Legend />
-            <Bar dataKey="hours" fill="#2563eb" name="Hours" radius={[8, 8, 0, 0]} />
+            <Bar 
+              dataKey="hours" 
+              fill="#2563eb" 
+              name="Hours" 
+              radius={[4, 4, 0, 0]}
+            />
           </BarChart>
         </ResponsiveContainer>
       </div>

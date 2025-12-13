@@ -44,7 +44,15 @@ export function CalendarHeatmap({ data }) {
   data.data.forEach(item => {
     if (item && item.date) {
       // Normalize date to YYYY-MM-DD format
-      const dateStr = item.date.split('T')[0];
+      let dateStr;
+      if (typeof item.date === 'string') {
+        dateStr = item.date.includes('T') ? item.date.split('T')[0] : item.date;
+      } else if (item.date instanceof Date) {
+        dateStr = item.date.toISOString().split('T')[0];
+      } else {
+        console.warn('Unexpected date format:', item.date);
+        return;
+      }
       dataMap.set(dateStr, item);
     }
   });
