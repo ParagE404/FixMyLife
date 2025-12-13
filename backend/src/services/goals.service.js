@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { throwError } from "../middleware/errorHandler.js";
+import { createInsight } from "./recommendations.service.js";
 
 const prisma = new PrismaClient();
 
@@ -61,20 +62,43 @@ export const getGoals = async (userId, filters = {}) => {
       (sum, p) => sum + p.hoursLogged,
       0
     );
+    
+    // Calculate current week progress (more intuitive for weekly goals)
+    const now = new Date();
+    const startOfWeek = new Date(now);
+    startOfWeek.setDate(now.getDate() - now.getDay()); // Start of current week (Sunday)
+    startOfWeek.setHours(0, 0, 0, 0);
+    
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 7);
+    
+    // Get this week's logged hours
+    const thisWeekLogged = goal.progress
+      .filter(p => {
+        const progressDate = new Date(p.date);
+        return progressDate >= startOfWeek && progressDate < endOfWeek;
+      })
+      .reduce((sum, p) => sum + p.hoursLogged, 0);
+    
+    // Calculate overall progress since start
     const weeksSinceStart = Math.ceil(
       (new Date() - new Date(goal.startDate)) / (7 * 24 * 60 * 60 * 1000)
     );
     const expectedHours = goal.targetHours * weeksSinceStart;
-    const progressPercent =
-      expectedHours > 0 ? Math.round((totalLogged / expectedHours) * 100) : 0;
+    const overallProgressPercent = expectedHours > 0 ? Math.round((totalLogged / expectedHours) * 100) : 0;
+    
+    // Calculate this week's progress
+    const weeklyProgressPercent = goal.targetHours > 0 ? Math.round((thisWeekLogged / goal.targetHours) * 100) : 0;
 
     return {
       ...goal,
       totalLogged,
+      thisWeekLogged,
       weeksSinceStart,
       expectedHours,
-      progressPercent,
-      isOnTrack: progressPercent >= 80,
+      progressPercent: overallProgressPercent,
+      weeklyProgressPercent,
+      isOnTrack: weeklyProgressPercent >= 80, // Based on current week progress
     };
   });
 

@@ -68,21 +68,41 @@ export function GoalCard({ goal, onDelete, onUpdate }) {
         </span>
       </div>
 
-      {/* Progress Bar */}
-      <div className="mb-4">
-        <div className="flex justify-between mb-2">
-          <span className="text-sm font-medium text-gray-700">Progress</span>
-          <span className="text-sm text-gray-600">
-            {goal.totalLogged.toFixed(1)}h / {goal.expectedHours.toFixed(1)}h
-          </span>
+      {/* Progress Bars */}
+      <div className="mb-4 space-y-3">
+        {/* This Week Progress */}
+        <div>
+          <div className="flex justify-between mb-2">
+            <span className="text-sm font-medium text-gray-700">This Week</span>
+            <span className="text-sm text-gray-600">
+              {(goal.thisWeekLogged || 0).toFixed(1)}h / {goal.targetHours}h
+            </span>
+          </div>
+          <div className="w-full bg-gray-200 rounded-full h-3">
+            <div
+              className="bg-green-500 h-3 rounded-full transition-all"
+              style={{ width: `${Math.min(goal.weeklyProgressPercent || 0, 100)}%` }}
+            ></div>
+          </div>
+          <p className="text-xs text-gray-600 mt-1">{goal.weeklyProgressPercent || 0}% of weekly target</p>
         </div>
-        <div className="w-full bg-gray-200 rounded-full h-3">
-          <div
-            className="bg-blue-500 h-3 rounded-full transition-all"
-            style={{ width: `${Math.min(goal.progressPercent, 100)}%` }}
-          ></div>
+        
+        {/* Overall Progress */}
+        <div>
+          <div className="flex justify-between mb-2">
+            <span className="text-sm font-medium text-gray-700">Overall Progress</span>
+            <span className="text-sm text-gray-600">
+              {goal.totalLogged.toFixed(1)}h / {goal.expectedHours.toFixed(1)}h
+            </span>
+          </div>
+          <div className="w-full bg-gray-200 rounded-full h-2">
+            <div
+              className="bg-blue-500 h-2 rounded-full transition-all"
+              style={{ width: `${Math.min(goal.progressPercent, 100)}%` }}
+            ></div>
+          </div>
+          <p className="text-xs text-gray-600 mt-1">{goal.progressPercent}% complete since start</p>
         </div>
-        <p className="text-xs text-gray-600 mt-1">{goal.progressPercent}% complete</p>
       </div>
 
       {/* Stats */}

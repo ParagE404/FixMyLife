@@ -69,18 +69,18 @@ export const generateRecommendations = async (userId) => {
 
     // 4. Category imbalance detection
     const sortedCategories = Object.entries(categoryBreakdown)
-      .sort((a, b) => b - a);
+      .sort((a, b) => b[1] - a[1]); // Sort by duration (second element)
 
     if (sortedCategories.length > 1) {
-      const topCategory = sortedCategories;
-      const secondCategory = sortedCategories;
-      const ratio = topCategory / secondCategory;
+      const [topCategoryName, topCategoryHours] = sortedCategories[0];
+      const [secondCategoryName, secondCategoryHours] = sortedCategories[1];
+      const ratio = topCategoryHours / secondCategoryHours;
 
       if (ratio > 3) {
         recommendations.push({
           type: 'suggestion',
           title: '⚖️ Balance Your Activities',
-          message: `${topCategory} is taking up most of your time. Consider exploring "${secondCategory}" more.`,
+          message: `${topCategoryName} is taking up most of your time. Consider exploring "${secondCategoryName}" more.`,
           priority: 'medium',
         });
       }
@@ -113,7 +113,7 @@ export const generateRecommendations = async (userId) => {
     );
 
     if (unexploredCategories.length > 0 && Object.keys(categoryBreakdown).length < 3) {
-      const suggestion = unexploredCategories;
+      const suggestion = unexploredCategories[0]; // Get the first unexplored category
       recommendations.push({
         type: 'suggestion',
         title: '🆕 Try Something New',

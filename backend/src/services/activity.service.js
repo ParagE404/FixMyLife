@@ -108,6 +108,9 @@ export const parseAndCreateActivities = async (userId, textInput) => {
       // Update daily aggregate
       await updateDailyAggregate(userId, startTime);
 
+      // Update goal progress for matching categories
+      await updateGoalProgressFromActivity(userId, categoryId, customCategoryId, duration);
+
       createdActivities.push(activity);
     }
 
@@ -177,6 +180,9 @@ export const createActivity = async (userId, activityData) => {
 
     await updateActivitySuggestion(userId, description, categoryId);
     await updateDailyAggregate(userId, start);
+
+    // Update goal progress for matching categories
+    await updateGoalProgressFromActivity(userId, categoryId, customCategoryId, duration);
 
     return activity;
   } catch (error) {
@@ -412,6 +418,67 @@ async function updateDailyAggregate(userId, activityDate) {
     });
   } catch (error) {
     console.error('Daily aggregate error:', error);
+    // Don't throw - this is optional
+  }
+}
+
+// Helper: Update goal progress from activity
+async function updateGoalProgressFromActivity(userId, categoryId, customCategoryId, duration) {
+  try {
+    if (!duration || duration <= 0) return;
+
+    // Find active goals that match the activity's category
+    const matchingGoals = await prisma.goal.findMany({
+      where: {
+        userId,
+        status: 'active',
+        OR: [
+          ...(categoryId ? [{ categoryId }] : []),
+          ...(customCategoryId ? [{ customCategoryId }] : []),
+        ],
+      },
+    });
+
+    if (matchingGoals.length === 0) return;
+
+    const hoursLogged = duration / 60; // convert minutes to hours
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Update progress for each matching goal
+    for (const goal of matchingGoals) {
+      // Check if we already have progress logged for today
+      const existingProgress = await prisma.goalProgress.findFirst({
+        where: {
+          goalId: goal.id,
+          date: {
+            gte: today,
+            lt: new Date(today.getTime() + 24 * 60 * 60 * 1000),
+          },
+        },
+      });
+
+      if (existingProgress) {
+        // Update existing progress for today
+        await prisma.goalProgress.update({
+          where: { id: existingProgress.id },
+          data: {
+            hoursLogged: existingProgress.hoursLogged + hoursLogged,
+          },
+        });
+      } else {
+        // Create new progress entry for today
+        await prisma.goalProgress.create({
+          data: {
+            goalId: goal.id,
+            date: today,
+            hoursLogged,
+          },
+        });
+      }
+    }
+  } catch (error) {
+    console.error('Goal progress update error:', error);
     // Don't throw - this is optional
   }
 }
