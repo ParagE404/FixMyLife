@@ -8,13 +8,14 @@ export function MobileNav() {
     { path: '/dashboard', label: 'Dashboard', icon: '📊' },
     { path: '/activities', label: 'Activities', icon: '📝' },
     { path: '/goals', label: 'Goals', icon: '🎯' },
+    { path: '/profile', label: 'Profile', icon: '👤' },
   ];
 
   const isActive = (path) => location.pathname === path;
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-surface border-t border-border px-4 py-3 md:hidden">
-      <div className="grid grid-cols-3 gap-0">
+      <div className="grid grid-cols-4 gap-0">
         {navItems.map((item) => (
           <button
             key={item.path}
