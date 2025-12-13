@@ -4,7 +4,20 @@ import { useAuthStore } from '../stores/authStore';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Progress } from '../components/ui/progress';
-import { Activity, TrendingUp, Target, Calendar, BarChart3, Clock } from 'lucide-react';
+import { Badge } from '../components/ui/badge';
+import { Separator } from '../components/ui/separator';
+import { LoadingPage, LoadingCard } from '../components/ui/loading';
+import { 
+  Activity, 
+  TrendingUp, 
+  Target, 
+  Calendar, 
+  BarChart3, 
+  Clock,
+  RefreshCw,
+  AlertCircle,
+  Sparkles
+} from 'lucide-react';
 
 export function DashboardPage() {
   const { token } = useAuthStore();
@@ -47,37 +60,42 @@ export function DashboardPage() {
   }, [loadDashboardData]);
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-background p-4 flex items-center justify-center">
-        <div className="flex items-center space-x-2">
-          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
-          <p className="text-muted-foreground">Loading dashboard...</p>
-        </div>
-      </div>
-    );
+    return <LoadingPage text="Loading your dashboard..." />;
   }
 
   const { weeklyData, categoryData, trendsData, habitStrength } = dashboardData;
 
   return (
     <div className="min-h-screen bg-background p-4 pb-24">
-      <div className="max-w-6xl mx-auto space-y-6">
+      <div className="max-w-6xl mx-auto space-y-6 animate-fade-in">
         {/* Header */}
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold">Dashboard</h1>
-            <p className="text-muted-foreground">Your activity insights and trends</p>
-          </div>
-          <Button onClick={loadDashboardData} variant="outline" size="sm">
-            <Activity className="w-4 h-4 mr-2" />
-            Refresh
-          </Button>
-        </div>
+        <Card className="glass">
+          <CardHeader>
+            <div className="flex justify-between items-start">
+              <div className="space-y-1">
+                <CardTitle className="text-2xl flex items-center gap-2">
+                  <Sparkles className="w-6 h-6 text-primary" />
+                  Dashboard
+                </CardTitle>
+                <CardDescription>
+                  Your activity insights and progress tracking
+                </CardDescription>
+              </div>
+              <Button onClick={loadDashboardData} variant="outline" size="sm">
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Refresh
+              </Button>
+            </div>
+          </CardHeader>
+        </Card>
 
         {error && (
-          <Card className="border-destructive">
+          <Card className="border-destructive/50 bg-destructive/5">
             <CardContent className="pt-6">
-              <p className="text-destructive">{error}</p>
+              <div className="flex items-center gap-2 text-destructive">
+                <AlertCircle className="w-4 h-4" />
+                <p>{error}</p>
+              </div>
             </CardContent>
           </Card>
         )}

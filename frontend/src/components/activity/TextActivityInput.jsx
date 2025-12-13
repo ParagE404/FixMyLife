@@ -1,6 +1,22 @@
 import { useState } from "react";
 import { activityService } from "../../services/activity.service";
 import { useAuthStore } from "../../stores/authStore";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import { Textarea } from "../ui/textarea";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
+import { Badge } from "../ui/badge";
+import { Separator } from "../ui/separator";
+import { 
+  Sparkles, 
+  Clock, 
+  Tag, 
+  FileText, 
+  CheckCircle, 
+  AlertCircle,
+  Loader2
+} from "lucide-react";
 
 export function TextActivityInput({ onActivitiesCreated }) {
   const [input, setInput] = useState("");
@@ -41,109 +57,150 @@ export function TextActivityInput({ onActivitiesCreated }) {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Input Form */}
-      <form onSubmit={handleParse} className="space-y-3">
-        <textarea
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Describe your day: 'Worked 9-5, lunch at noon, gym at 6'"
-          className="w-full px-4 py-3 border rounded-lg resize-none h-24"
-        />
+      <form onSubmit={handleParse} className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="activity-input" className="flex items-center gap-2">
+            <FileText className="w-4 h-4" />
+            Describe your activities
+          </Label>
+          <Textarea
+            id="activity-input"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Example: 'Worked on project from 9-12, had lunch at 12:30, went to gym at 6pm for 1 hour'"
+            className="min-h-[100px] resize-none"
+          />
+        </div>
 
         {error && (
-          <div className="p-3 bg-red-100 text-red-700 rounded text-sm">
+          <div className="flex items-center gap-2 p-3 bg-destructive/10 border border-destructive/20 text-destructive rounded-md text-sm">
+            <AlertCircle className="w-4 h-4" />
             {error}
           </div>
         )}
 
-        <button
+        <Button
           type="submit"
           disabled={isLoading || !input.trim()}
-          className="w-full py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50"
+          className="w-full"
+          size="lg"
         >
-          {isLoading ? "Parsing..." : "Parse Activities"}
-        </button>
+          {isLoading ? (
+            <>
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              Parsing activities...
+            </>
+          ) : (
+            <>
+              <Sparkles className="w-4 h-4 mr-2" />
+              Parse Activities
+            </>
+          )}
+        </Button>
       </form>
 
       {/* Parsed Activities Preview */}
       {parsedActivities.length > 0 && (
-        <div className="space-y-3">
-          <h3 className="font-bold text-lg">Confirm Activities:</h3>
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <CheckCircle className="w-5 h-5 text-green-600" />
+            <h3 className="font-semibold text-lg">Review & Confirm Activities</h3>
+          </div>
 
-          {parsedActivities.map((activity, idx) => (
-            <div key={idx} className="p-3 border rounded-lg space-y-2">
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  Description
-                </label>
-                <input
-                  type="text"
-                  value={activity.description}
-                  onChange={(e) =>
-                    handleEdit(idx, "description", e.target.value)
-                  }
-                  className="w-full px-3 py-2 border rounded text-sm"
-                />
-              </div>
+          <div className="space-y-3">
+            {parsedActivities.map((activity, idx) => (
+              <Card key={idx}>
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-base">Activity {idx + 1}</CardTitle>
+                    <Badge 
+                      variant={activity.confidenceScore > 0.7 ? "success" : "warning"}
+                      className="text-xs"
+                    >
+                      {(activity.confidenceScore * 100).toFixed(0)}% confidence
+                    </Badge>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor={`desc-${idx}`} className="flex items-center gap-2">
+                      <FileText className="w-4 h-4" />
+                      Description
+                    </Label>
+                    <Input
+                      id={`desc-${idx}`}
+                      value={activity.description}
+                      onChange={(e) =>
+                        handleEdit(idx, "description", e.target.value)
+                      }
+                    />
+                  </div>
 
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  Category
-                </label>
-                <input
-                  type="text"
-                  value={activity.category.name}
-                  onChange={(e) => handleEdit(idx, "category", e.target.value)}
-                  className="w-full px-3 py-2 border rounded text-sm"
-                />
-              </div>
+                  <div className="space-y-2">
+                    <Label htmlFor={`cat-${idx}`} className="flex items-center gap-2">
+                      <Tag className="w-4 h-4" />
+                      Category
+                    </Label>
+                    <Input
+                      id={`cat-${idx}`}
+                      value={activity.category.name}
+                      onChange={(e) => handleEdit(idx, "category", e.target.value)}
+                    />
+                  </div>
 
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Start
-                  </label>
-                  <input
-                    type="time"
-                    value={
-                      activity.startTime
-                        ? activity.startTime.substring(11, 16)
-                        : ""
-                    }
-                    onChange={(e) =>
-                      handleEdit(idx, "startTime", e.target.value)
-                    }
-                    className="w-full px-3 py-2 border rounded text-sm"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">End</label>
-                  <input
-                    type="time"
-                    value={   activity.endTime
-                        ? activity.endTime.substring(11, 16)
-                        : ""}
-                    onChange={(e) => handleEdit(idx, "endTime", e.target.value)}
-                    className="w-full px-3 py-2 border rounded text-sm"
-                  />
-                </div>
-              </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor={`start-${idx}`} className="flex items-center gap-2">
+                        <Clock className="w-4 h-4" />
+                        Start Time
+                      </Label>
+                      <Input
+                        id={`start-${idx}`}
+                        type="time"
+                        value={
+                          activity.startTime
+                            ? activity.startTime.substring(11, 16)
+                            : ""
+                        }
+                        onChange={(e) =>
+                          handleEdit(idx, "startTime", e.target.value)
+                        }
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor={`end-${idx}`} className="flex items-center gap-2">
+                        <Clock className="w-4 h-4" />
+                        End Time
+                      </Label>
+                      <Input
+                        id={`end-${idx}`}
+                        type="time"
+                        value={
+                          activity.endTime
+                            ? activity.endTime.substring(11, 16)
+                            : ""
+                        }
+                        onChange={(e) => handleEdit(idx, "endTime", e.target.value)}
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
 
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  Confidence: {(activity.confidenceScore * 100).toFixed(0)}%
-                </label>
-              </div>
-            </div>
-          ))}
+          <Separator />
 
-          <button
+          <Button
             onClick={handleConfirm}
-            className="w-full py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700"
+            className="w-full bg-green-600 hover:bg-green-700"
+            size="lg"
           >
-            Confirm & Save Activities
-          </button>
+            <CheckCircle className="w-4 h-4 mr-2" />
+            Confirm & Save {parsedActivities.length} Activities
+          </Button>
         </div>
       )}
     </div>

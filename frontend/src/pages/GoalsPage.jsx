@@ -1,8 +1,25 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { goalsService } from '../services/goals.service';
 import { useAuthStore } from '../stores/authStore';
 import { GoalCard } from '../components/goals/GoalCard';
 import { RecommendationsPanel } from '../components/goals/RecommendationsPanel';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Label } from '../components/ui/label';
+import { Textarea } from '../components/ui/textarea';
+import { Badge } from '../components/ui/badge';
+import { LoadingPage } from '../components/ui/loading';
+import { 
+  Target, 
+  Plus, 
+  Calendar, 
+  Clock, 
+  FileText,
+  AlertCircle,
+  Sparkles,
+  Trophy
+} from 'lucide-react';
 
 export function GoalsPage() {
   const { token } = useAuthStore();
@@ -18,11 +35,7 @@ export function GoalsPage() {
     endDate: '',
   });
 
-  useEffect(() => {
-    loadGoals();
-  }, [token]);
-
-  const loadGoals = async () => {
+  const loadGoals = useCallback(async () => {
     try {
       setLoading(true);
       const data = await goalsService.getGoals('active', token);
@@ -32,7 +45,11 @@ export function GoalsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
+
+  useEffect(() => {
+    loadGoals();
+  }, [loadGoals]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -55,122 +72,162 @@ export function GoalsPage() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-background p-4 flex items-center justify-center">
-        <p className="text-text-secondary">Loading goals...</p>
-      </div>
-    );
+    return <LoadingPage text="Loading your goals..." />;
   }
 
   return (
     <div className="min-h-screen bg-background p-4 pb-24">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-6xl mx-auto space-y-6 animate-fade-in">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Goals</h1>
-          <p className="text-text-secondary">Set and track your activity goals</p>
-        </div>
+        <Card className="glass">
+          <CardHeader>
+            <div className="flex justify-between items-start">
+              <div className="space-y-1">
+                <CardTitle className="text-2xl flex items-center gap-2">
+                  <Target className="w-6 h-6 text-primary" />
+                  Goals
+                </CardTitle>
+                <CardDescription>
+                  Set and track your activity goals to build better habits
+                </CardDescription>
+              </div>
+              <Button onClick={() => setShowForm(!showForm)} className="flex items-center gap-2">
+                <Plus className="w-4 h-4" />
+                New Goal
+              </Button>
+            </div>
+          </CardHeader>
+        </Card>
 
         {error && (
-          <div className="p-4 bg-error/10 text-error rounded-lg mb-6">
-            {error}
-          </div>
+          <Card className="border-destructive/50 bg-destructive/5">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-2 text-destructive">
+                <AlertCircle className="w-4 h-4" />
+                <p>{error}</p>
+              </div>
+            </CardContent>
+          </Card>
         )}
 
         {/* New Goal Form */}
         {showForm && (
-          <div className="bg-surface rounded-lg p-6 border border-border mb-8">
-            <h2 className="text-xl font-bold mb-4">Create New Goal</h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">Goal Title</label>
-                <input
-                  type="text"
-                  placeholder="E.g., Exercise Daily"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full px-4 py-2 border border-border rounded-lg bg-background"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-1">Description (optional)</label>
-                <textarea
-                  placeholder="What's this goal about?"
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full px-4 py-2 border border-border rounded-lg bg-background"
-                  rows="2"
-                ></textarea>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">Target Hours/Week</label>
-                  <input
-                    type="number"
-                    step="0.5"
-                    min="0"
-                    value={formData.targetHours}
-                    onChange={(e) => setFormData({ ...formData, targetHours: e.target.value })}
-                    className="w-full px-4 py-2 border border-border rounded-lg bg-background"
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Sparkles className="w-5 h-5" />
+                Create New Goal
+              </CardTitle>
+              <CardDescription>
+                Define your target and start building a new habit
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="title" className="flex items-center gap-2">
+                    <FileText className="w-4 h-4" />
+                    Goal Title
+                  </Label>
+                  <Input
+                    id="title"
+                    placeholder="E.g., Exercise Daily, Read More Books"
+                    value={formData.title}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">End Date (optional)</label>
-                  <input
-                    type="date"
-                    value={formData.endDate}
-                    onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                    className="w-full px-4 py-2 border border-border rounded-lg bg-background"
+
+                <div className="space-y-2">
+                  <Label htmlFor="description">Description (optional)</Label>
+                  <Textarea
+                    id="description"
+                    placeholder="What's this goal about? Why is it important to you?"
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    rows={3}
                   />
                 </div>
-              </div>
 
-              <div className="flex gap-3">
-                <button
-                  type="submit"
-                  className="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover font-medium"
-                >
-                  Create Goal
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowForm(false)}
-                  className="flex-1 px-4 py-2 bg-secondary text-text rounded-lg hover:bg-secondary-hover font-medium"
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="targetHours" className="flex items-center gap-2">
+                      <Clock className="w-4 h-4" />
+                      Target Hours/Week
+                    </Label>
+                    <Input
+                      id="targetHours"
+                      type="number"
+                      step="0.5"
+                      min="0"
+                      value={formData.targetHours}
+                      onChange={(e) => setFormData({ ...formData, targetHours: e.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="endDate" className="flex items-center gap-2">
+                      <Calendar className="w-4 h-4" />
+                      End Date (optional)
+                    </Label>
+                    <Input
+                      id="endDate"
+                      type="date"
+                      value={formData.endDate}
+                      onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                    />
+                  </div>
+                </div>
+
+                <div className="flex gap-3 pt-4">
+                  <Button type="submit" className="flex-1">
+                    <Trophy className="w-4 h-4 mr-2" />
+                    Create Goal
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setShowForm(false)}
+                    className="flex-1"
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
         )}
 
-        {/* Active Goals */}
-        <div className="grid md:grid-cols-3 gap-8 mb-8">
-          <div className="md:col-span-2">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold">Active Goals</h2>
-              <button
-                onClick={() => setShowForm(!showForm)}
-                className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover font-medium"
-              >
-                + New Goal
-              </button>
-            </div>
-
+        {/* Goals Grid */}
+        <div className="grid lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-6">
             {goals.length === 0 ? (
-              <div className="text-center py-12 bg-surface rounded-lg border border-border">
-                <p className="text-text-secondary mb-4">No goals yet. Create your first one!</p>
-                <button
-                  onClick={() => setShowForm(true)}
-                  className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover font-medium"
-                >
-                  Create Goal
-                </button>
-              </div>
+              <Card>
+                <CardContent className="text-center py-12">
+                  <div className="space-y-4">
+                    <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto">
+                      <Target className="w-8 h-8 text-muted-foreground" />
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className="text-lg font-semibold">No goals yet</h3>
+                      <p className="text-muted-foreground">
+                        Create your first goal to start tracking your progress
+                      </p>
+                    </div>
+                    <Button onClick={() => setShowForm(true)} className="mt-4">
+                      <Plus className="w-4 h-4 mr-2" />
+                      Create Your First Goal
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
             ) : (
               <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-semibold">Active Goals</h2>
+                  <Badge variant="secondary" className="flex items-center gap-1">
+                    <Trophy className="w-3 h-3" />
+                    {goals.length} active
+                  </Badge>
+                </div>
                 {goals.map((goal) => (
                   <GoalCard
                     key={goal.id}
@@ -184,8 +241,18 @@ export function GoalsPage() {
           </div>
 
           {/* Recommendations Sidebar */}
-          <div className="bg-surface rounded-lg p-6 border border-border h-fit">
-            <RecommendationsPanel />
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Recommendations</CardTitle>
+                <CardDescription>
+                  Personalized suggestions to help you succeed
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <RecommendationsPanel />
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>

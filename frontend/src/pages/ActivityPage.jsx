@@ -1,69 +1,65 @@
 import { useState } from 'react';
 import { TextActivityInput } from '../components/activity/TextActivityInput';
 import { VoiceActivityInput } from '../components/activity/VoiceActivityInput';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
+import { Badge } from '../components/ui/badge';
+import { PenTool, Mic, CheckCircle } from 'lucide-react';
 
 export function ActivityPage() {
-  const [activeTab, setActiveTab] = useState('text');
   const [message, setMessage] = useState('');
 
   const handleActivitiesCreated = (activities) => {
-    setMessage(`✅ Created ${activities.length} activities!`);
+    setMessage(`Created ${activities.length} activities!`);
     setTimeout(() => setMessage(''), 3000);
   };
 
   return (
-    <div className="min-h-screen bg-background p-4">
-      <div className="max-w-md mx-auto">
+    <div className="min-h-screen bg-background p-4 pb-24">
+      <div className="max-w-2xl mx-auto space-y-6">
         {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold mb-2">Log Activities</h1>
-          <p className="text-text-secondary text-sm">
-            Describe your day and we'll categorize it for you
-          </p>
-        </div>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-2xl">Log Activities</CardTitle>
+            <CardDescription>
+              Describe your day and we'll categorize it for you automatically
+            </CardDescription>
+          </CardHeader>
+        </Card>
 
         {/* Success Message */}
         {message && (
-          <div className="p-3 bg-green-100 text-green-700 rounded mb-4 text-sm">
+          <Badge variant="success" className="w-full justify-center py-3 text-sm">
+            <CheckCircle className="w-4 h-4 mr-2" />
             {message}
-          </div>
+          </Badge>
         )}
 
-        {/* Tabs */}
-        <div className="flex gap-2 mb-6 border-b">
-          <button
-            onClick={() => setActiveTab('text')}
-            className={`px-4 py-2 font-medium border-b-2 ${
-              activeTab === 'text'
-                ? 'border-primary text-primary'
-                : 'border-transparent text-text-secondary'
-            }`}
-          >
-            📝 Text
-          </button>
-          <button
-            onClick={() => setActiveTab('voice')}
-            className={`px-4 py-2 font-medium border-b-2 ${
-              activeTab === 'voice'
-                ? 'border-primary text-primary'
-                : 'border-transparent text-text-secondary'
-            }`}
-          >
-            🎤 Voice
-          </button>
-        </div>
-
-        {/* Tab Content */}
-        <div>
-          {activeTab === 'text' && (
-            <TextActivityInput onActivitiesCreated={handleActivitiesCreated} />
-          )}
-          {activeTab === 'voice' && (
-            <VoiceActivityInput
-              onActivitiesCreated={handleActivitiesCreated}
-            />
-          )}
-        </div>
+        {/* Activity Input Tabs */}
+        <Card>
+          <CardContent className="p-6">
+            <Tabs defaultValue="text" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="text" className="flex items-center gap-2">
+                  <PenTool className="w-4 h-4" />
+                  Text Input
+                </TabsTrigger>
+                <TabsTrigger value="voice" className="flex items-center gap-2">
+                  <Mic className="w-4 h-4" />
+                  Voice Input
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="text" className="mt-6">
+                <TextActivityInput onActivitiesCreated={handleActivitiesCreated} />
+              </TabsContent>
+              
+              <TabsContent value="voice" className="mt-6">
+                <VoiceActivityInput onActivitiesCreated={handleActivitiesCreated} />
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

@@ -1,6 +1,20 @@
 import { useState, useRef, useEffect } from 'react';
 import { activityService } from '../../services/activity.service';
 import { useAuthStore } from '../../stores/authStore';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { Badge } from '../ui/badge';
+import { Separator } from '../ui/separator';
+import { 
+  Mic, 
+  MicOff, 
+  Sparkles, 
+  CheckCircle, 
+  AlertCircle,
+  Loader2,
+  Volume2,
+  FileAudio
+} from 'lucide-react';
 
 export function VoiceActivityInput({ onActivitiesCreated }) {
   const [isRecording, setIsRecording] = useState(false);
@@ -33,14 +47,10 @@ export function VoiceActivityInput({ onActivitiesCreated }) {
     };
 
     recognition.onresult = (event) => {
-      let interimTranscript = '';
-
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const transcript = event.results[i].transcript;
         if (event.results[i].isFinal) {
           setTranscript((prev) => prev + transcript + ' ');
-        } else {
-          interimTranscript += transcript;
         }
       }
 
@@ -102,76 +112,135 @@ export function VoiceActivityInput({ onActivitiesCreated }) {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Recording Controls */}
-      <div className="space-y-3">
-        <button
-          onClick={
-            isRecording ? handleStopRecording : handleStartRecording
-          }
-          className={`w-full py-3 text-white rounded-lg font-medium text-lg ${
-            isRecording
-              ? 'bg-red-600 hover:bg-red-700'
-              : 'bg-blue-600 hover:bg-blue-700'
-          }`}
-        >
-          {isRecording ? '⏹ Stop Recording' : '🎤 Start Recording'}
-        </button>
+      <Card>
+        <CardHeader className="text-center">
+          <CardTitle className="flex items-center justify-center gap-2">
+            <Volume2 className="w-5 h-5" />
+            Voice Recording
+          </CardTitle>
+          <CardDescription>
+            Speak naturally about your activities and we'll parse them for you
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Button
+            onClick={isRecording ? handleStopRecording : handleStartRecording}
+            variant={isRecording ? "destructive" : "default"}
+            size="lg"
+            className="w-full"
+          >
+            {isRecording ? (
+              <>
+                <MicOff className="w-5 h-5 mr-2" />
+                Stop Recording
+              </>
+            ) : (
+              <>
+                <Mic className="w-5 h-5 mr-2" />
+                Start Recording
+              </>
+            )}
+          </Button>
 
-        {isRecording && (
-          <div className="text-center text-sm text-blue-600 font-medium">
-            Recording... (stops after 3s of silence)
-          </div>
-        )}
-      </div>
+          {isRecording && (
+            <div className="text-center">
+              <Badge variant="default" className="animate-pulse">
+                <div className="w-2 h-2 bg-red-500 rounded-full mr-2 animate-ping"></div>
+                Recording... (stops after 3s of silence)
+              </Badge>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
-      {/* Transcript */}
+      {/* Transcript Display */}
       {transcript && (
-        <div className="p-3 bg-gray-50 rounded-lg">
-          <p className="text-sm font-medium mb-2">Transcript:</p>
-          <p className="text-sm text-gray-700">{transcript}</p>
-        </div>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileAudio className="w-5 h-5" />
+              Transcript
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="p-4 bg-muted rounded-lg">
+              <p className="text-sm leading-relaxed">{transcript}</p>
+            </div>
+          </CardContent>
+        </Card>
       )}
 
+      {/* Error Display */}
       {error && (
-        <div className="p-3 bg-red-100 text-red-700 rounded text-sm">
+        <div className="flex items-center gap-2 p-3 bg-destructive/10 border border-destructive/20 text-destructive rounded-md text-sm">
+          <AlertCircle className="w-4 h-4" />
           {error}
         </div>
       )}
 
       {/* Parse Button */}
       {transcript && (
-        <button
+        <Button
           onClick={handleParse}
           disabled={isLoading}
-          className="w-full py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50"
+          className="w-full"
+          size="lg"
         >
-          {isLoading ? 'Parsing...' : 'Parse Activities'}
-        </button>
+          {isLoading ? (
+            <>
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              Parsing activities...
+            </>
+          ) : (
+            <>
+              <Sparkles className="w-4 h-4 mr-2" />
+              Parse Activities
+            </>
+          )}
+        </Button>
       )}
 
       {/* Parsed Activities Preview */}
       {parsedActivities.length > 0 && (
-        <div className="space-y-3">
-          <h3 className="font-bold text-lg">
-            Found {parsedActivities.length} Activities
-          </h3>
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <CheckCircle className="w-5 h-5 text-green-600" />
+            <h3 className="font-semibold text-lg">
+              Found {parsedActivities.length} Activities
+            </h3>
+          </div>
 
-          {parsedActivities.map((activity, idx) => (
-            <div key={idx} className="p-3 border rounded-lg">
-              <p className="font-medium">{activity.description}</p>
-              <p className="text-sm text-gray-600">
-                {activity.category} • {activity.startTime} - {activity.endTime}
-              </p>
-            </div>
-          ))}
+          <div className="space-y-3">
+            {parsedActivities.map((activity, idx) => (
+              <Card key={idx}>
+                <CardContent className="pt-4">
+                  <div className="space-y-2">
+                    <p className="font-medium">{activity.description}</p>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Badge variant="outline" className="text-xs">
+                        {activity.category?.name || activity.category}
+                      </Badge>
+                      <span>•</span>
+                      <span>{activity.startTime} - {activity.endTime}</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
 
-          <button
+          <Separator />
+
+          <Button
             onClick={handleConfirm}
-            className="w-full py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700"
+            className="w-full bg-green-600 hover:bg-green-700"
+            size="lg"
           >
-            Confirm & Save Activities
-          </button>
+            <CheckCircle className="w-4 h-4 mr-2" />
+            Confirm & Save {parsedActivities.length} Activities
+          </Button>
         </div>
       )}
     </div>

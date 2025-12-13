@@ -1,6 +1,23 @@
 import { useAuthStore } from '../stores/authStore';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { Badge } from '../components/ui/badge';
+import { Separator } from '../components/ui/separator';
+import { 
+  User, 
+  Mail, 
+  Settings, 
+  Lock, 
+  Bell, 
+  Info, 
+  LogOut,
+  ChevronRight,
+  Loader2,
+  Shield,
+  Smartphone
+} from 'lucide-react';
 
 export function ProfilePage() {
   const { user, logout } = useAuthStore();
@@ -13,69 +30,143 @@ export function ProfilePage() {
     navigate('/login');
   };
 
+  const settingsItems = [
+    { icon: User, label: 'Edit Profile', description: 'Update your personal information' },
+    { icon: Lock, label: 'Change Password', description: 'Update your account security' },
+    { icon: Bell, label: 'Notifications', description: 'Manage your notification preferences' },
+    { icon: Shield, label: 'Privacy', description: 'Control your data and privacy settings' },
+  ];
+
   return (
-    <div className="min-h-screen bg-background pb-20">
-      <div className="p-6">
+    <div className="min-h-screen bg-background p-4 pb-24">
+      <div className="max-w-2xl mx-auto space-y-6 animate-fade-in">
         {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-text">Profile</h1>
-        </div>
+        <Card className="glass">
+          <CardHeader>
+            <CardTitle className="text-2xl flex items-center gap-2">
+              <User className="w-6 h-6 text-primary" />
+              Profile
+            </CardTitle>
+            <CardDescription>
+              Manage your account settings and preferences
+            </CardDescription>
+          </CardHeader>
+        </Card>
 
         {/* Profile Info Card */}
-        <div className="bg-surface rounded-xl p-6 mb-6 border border-border">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center">
-              <span className="text-3xl">{user?.name?.charAt(0).toUpperCase() || '👤'}</span>
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center border-2 border-primary/20">
+                <span className="text-2xl font-bold text-primary">
+                  {user?.name?.charAt(0).toUpperCase() || 'U'}
+                </span>
+              </div>
+              <div className="flex-1">
+                <CardTitle className="text-xl">{user?.name || 'User'}</CardTitle>
+                <CardDescription className="flex items-center gap-2 mt-1">
+                  <Mail className="w-4 h-4" />
+                  {user?.email || 'No email provided'}
+                </CardDescription>
+              </div>
+              <Badge variant="secondary" className="flex items-center gap-1">
+                <Smartphone className="w-3 h-3" />
+                Mobile
+              </Badge>
             </div>
-            <div>
-              <h2 className="text-xl font-semibold text-text">{user?.name || 'User'}</h2>
-              <p className="text-text-secondary">{user?.email || 'No email'}</p>
-            </div>
-          </div>
-        </div>
+          </CardHeader>
+        </Card>
 
         {/* Account Settings */}
-        <div className="bg-surface rounded-xl p-4 mb-6 border border-border">
-          <h3 className="text-lg font-semibold text-text mb-4">Account Settings</h3>
-          <div className="space-y-2">
-            <button className="w-full text-left p-3 rounded-lg hover:bg-background transition-colors flex items-center justify-between">
-              <span className="text-text">Edit Profile</span>
-              <span className="text-text-secondary">→</span>
-            </button>
-            <button className="w-full text-left p-3 rounded-lg hover:bg-background transition-colors flex items-center justify-between">
-              <span className="text-text">Change Password</span>
-              <span className="text-text-secondary">→</span>
-            </button>
-            <button className="w-full text-left p-3 rounded-lg hover:bg-background transition-colors flex items-center justify-between">
-              <span className="text-text">Notifications</span>
-              <span className="text-text-secondary">→</span>
-            </button>
-          </div>
-        </div>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Settings className="w-5 h-5" />
+              Account Settings
+            </CardTitle>
+            <CardDescription>
+              Manage your account preferences and security
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-1">
+            {settingsItems.map((item, index) => {
+              const IconComponent = item.icon;
+              return (
+                <Button
+                  key={index}
+                  variant="ghost"
+                  className="w-full justify-start h-auto p-4"
+                  onClick={() => {/* TODO: Implement navigation */}}
+                >
+                  <div className="flex items-center gap-3 flex-1">
+                    <IconComponent className="w-5 h-5 text-muted-foreground" />
+                    <div className="text-left">
+                      <div className="font-medium">{item.label}</div>
+                      <div className="text-sm text-muted-foreground">{item.description}</div>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                </Button>
+              );
+            })}
+          </CardContent>
+        </Card>
 
         {/* App Information */}
-        <div className="bg-surface rounded-xl p-4 mb-6 border border-border">
-          <h3 className="text-lg font-semibold text-text mb-4">About</h3>
-          <div className="space-y-2">
-            <div className="flex justify-between p-3">
-              <span className="text-text-secondary">Version</span>
-              <span className="text-text">1.0.0</span>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Info className="w-5 h-5" />
+              About
+            </CardTitle>
+            <CardDescription>
+              Application information and version details
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <p className="text-sm text-muted-foreground">Version</p>
+                <Badge variant="outline">v1.0.0</Badge>
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm text-muted-foreground">App Name</p>
+                <Badge variant="outline">Habit Tracker</Badge>
+              </div>
             </div>
-            <div className="flex justify-between p-3">
-              <span className="text-text-secondary">App Name</span>
-              <span className="text-text">FixMyLife</span>
+            
+            <Separator />
+            
+            <div className="text-center text-sm text-muted-foreground">
+              Built with ❤️ for better habit tracking
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
-        {/* Logout Button */}
-        <button
-          onClick={handleLogout}
-          disabled={isLoggingOut}
-          className="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-6 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {isLoggingOut ? 'Logging out...' : 'Logout'}
-        </button>
+        {/* Logout Section */}
+        <Card className="border-destructive/20">
+          <CardContent className="pt-6">
+            <Button
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+              variant="destructive"
+              className="w-full"
+              size="lg"
+            >
+              {isLoggingOut ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Signing out...
+                </>
+              ) : (
+                <>
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Sign Out
+                </>
+              )}
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
