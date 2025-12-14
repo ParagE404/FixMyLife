@@ -62,7 +62,7 @@ export function GoalCard({ goal, onDelete, onUpdate }) {
   };
 
   return (
-    <Card className="overflow-hidden">
+    <Card className="overflow-hidden card-elevated color-transition hover:shadow-lg">
       <CardHeader className="pb-3">
         <div className="flex justify-between items-start">
           <div className="space-y-1">
@@ -198,7 +198,7 @@ export function GoalCard({ goal, onDelete, onUpdate }) {
             <>
               <Button
                 onClick={() => setShowProgress(!showProgress)}
-                variant="default"
+                variant="outline"
                 size="sm"
                 className="flex-1"
               >
@@ -208,9 +208,9 @@ export function GoalCard({ goal, onDelete, onUpdate }) {
               <Button
                 onClick={handleComplete}
                 disabled={loading}
-                variant="default"
+                variant="success"
                 size="sm"
-                className="flex-1 bg-green-600 hover:bg-green-700"
+                className="flex-1"
               >
                 <Check className="w-4 h-4 mr-1" />
                 Complete

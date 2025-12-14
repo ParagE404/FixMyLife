@@ -18,9 +18,14 @@ export function ActivityPage() {
     <div className="min-h-screen bg-background p-4 pb-24">
       <div className="max-w-2xl mx-auto space-y-6">
         {/* Header */}
-        <Card>
+        <Card className="glass card-elevated">
           <CardHeader>
-            <CardTitle className="text-2xl">Log Activities</CardTitle>
+            <CardTitle className="text-2xl flex items-center gap-2">
+              <div className="p-2 rounded-lg bg-purple-100">
+                <PenTool className="w-6 h-6 text-purple-600" />
+              </div>
+              Log Activities
+            </CardTitle>
             <CardDescription>
               Describe your day and we'll categorize it for you automatically
             </CardDescription>

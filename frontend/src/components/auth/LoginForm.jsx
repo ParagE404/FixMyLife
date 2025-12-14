@@ -108,6 +108,7 @@ export function LoginForm() {
             <Button
               type="submit"
               disabled={isLoading}
+              variant="gradient"
               className="w-full"
               size="lg"
             >

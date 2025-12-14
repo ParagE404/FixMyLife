@@ -41,10 +41,12 @@ export function ProfilePage() {
     <div className="min-h-screen bg-background p-4 pb-24">
       <div className="max-w-2xl mx-auto space-y-6 animate-fade-in">
         {/* Header */}
-        <Card className="glass">
+        <Card className="glass card-elevated">
           <CardHeader>
             <CardTitle className="text-2xl flex items-center gap-2">
-              <User className="w-6 h-6 text-primary" />
+              <div className="p-2 rounded-lg bg-accent/20">
+                <User className="w-6 h-6 text-accent-foreground" />
+              </div>
               Profile
             </CardTitle>
             <CardDescription>

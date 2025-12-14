@@ -79,19 +79,21 @@ export function GoalsPage() {
     <div className="min-h-screen bg-background p-4 pb-24">
       <div className="max-w-6xl mx-auto space-y-6 animate-fade-in">
         {/* Header */}
-        <Card className="glass">
+        <Card className="glass card-elevated">
           <CardHeader>
             <div className="flex justify-between items-start">
               <div className="space-y-1">
                 <CardTitle className="text-2xl flex items-center gap-2">
-                  <Target className="w-6 h-6 text-primary" />
+                  <div className="p-2 rounded-lg bg-green-100">
+                    <Target className="w-6 h-6 text-green-600" />
+                  </div>
                   Goals
                 </CardTitle>
                 <CardDescription>
                   Set and track your activity goals to build better habits
                 </CardDescription>
               </div>
-              <Button onClick={() => setShowForm(!showForm)} className="flex items-center gap-2">
+              <Button onClick={() => setShowForm(!showForm)} variant="gradient" className="flex items-center gap-2">
                 <Plus className="w-4 h-4" />
                 New Goal
               </Button>
@@ -178,7 +180,7 @@ export function GoalsPage() {
                 </div>
 
                 <div className="flex gap-3 pt-4">
-                  <Button type="submit" className="flex-1">
+                  <Button type="submit" variant="success" className="flex-1">
                     <Trophy className="w-4 h-4 mr-2" />
                     Create Goal
                   </Button>
@@ -212,7 +214,7 @@ export function GoalsPage() {
                         Create your first goal to start tracking your progress
                       </p>
                     </div>
-                    <Button onClick={() => setShowForm(true)} className="mt-4">
+                    <Button onClick={() => setShowForm(true)} variant="gradient" size="lg" className="mt-4">
                       <Plus className="w-4 h-4 mr-2" />
                       Create Your First Goal
                     </Button>

@@ -15,7 +15,7 @@ function AppContent() {
   const isAuthPage = ['/login', '/register'].includes(location.pathname);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+    <div className="min-h-screen bg-gray-50">
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />

@@ -195,8 +195,9 @@ export function TextActivityInput({ onActivitiesCreated }) {
 
           <Button
             onClick={handleConfirm}
-            className="w-full bg-green-600 hover:bg-green-700"
+            variant="success"
             size="lg"
+            className="w-full"
           >
             <CheckCircle className="w-4 h-4 mr-2" />
             Confirm & Save {parsedActivities.length} Activities

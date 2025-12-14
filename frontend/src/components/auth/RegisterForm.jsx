@@ -170,6 +170,7 @@ export function RegisterForm() {
             <Button
               type="submit"
               disabled={isLoading || passwordError}
+              variant="gradient"
               className="w-full"
               size="lg"
             >

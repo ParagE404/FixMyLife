@@ -47,10 +47,33 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        // Keep your existing colors for backward compatibility
-        surface: '#fffffe',
-        text: '#134252',
-        'text-secondary': '#626d6d',
+        // New semantic colors for habit tracking
+        success: {
+          DEFAULT: "hsl(var(--success))",
+          foreground: "hsl(var(--success-foreground))",
+        },
+        warning: {
+          DEFAULT: "hsl(var(--warning))",
+          foreground: "hsl(var(--warning-foreground))",
+        },
+        info: {
+          DEFAULT: "hsl(var(--info))",
+          foreground: "hsl(var(--info-foreground))",
+        },
+        // Gradient colors
+        'gradient-from': "hsl(var(--gradient-from))",
+        'gradient-to': "hsl(var(--gradient-to))",
+        // Direct color values for immediate visibility
+        'green-500': '#22c55e',
+        'green-600': '#16a34a',
+        'emerald-500': '#10b981',
+        'emerald-600': '#059669',
+        'orange-500': '#f97316',
+        'blue-500': '#3b82f6',
+        // Keep existing colors for backward compatibility
+        surface: '#ffffff',
+        text: '#1c1917',
+        'text-secondary': '#78716c',
       },
       borderRadius: {
         lg: "var(--radius)",

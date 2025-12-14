@@ -69,19 +69,21 @@ export function DashboardPage() {
     <div className="min-h-screen bg-background p-4 pb-24">
       <div className="max-w-6xl mx-auto space-y-6 animate-fade-in">
         {/* Header */}
-        <Card className="glass">
+        <Card className="glass card-elevated card-modern">
           <CardHeader>
             <div className="flex justify-between items-start">
               <div className="space-y-1">
                 <CardTitle className="text-2xl flex items-center gap-2">
-                  <Sparkles className="w-6 h-6 text-primary" />
+                  <div className="p-2 rounded-lg bg-blue-100">
+                    <Sparkles className="w-6 h-6 text-blue-600" />
+                  </div>
                   Dashboard
                 </CardTitle>
                 <CardDescription>
                   Your activity insights and progress tracking
                 </CardDescription>
               </div>
-              <Button onClick={loadDashboardData} variant="outline" size="sm">
+              <Button onClick={loadDashboardData} variant="outline" size="sm" className="color-transition">
                 <RefreshCw className="w-4 h-4 mr-2" />
                 Refresh
               </Button>
