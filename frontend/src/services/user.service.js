@@ -1,14 +1,14 @@
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 
 export const userService = {
-  async completeOnboarding(selectedCategories, goals, token) {
+  async completeOnboarding(selectedCategories, customCategories, goals, token) {
     const response = await fetch(`${API_URL}/users/complete-onboarding`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ selectedCategories, goals }),
+      body: JSON.stringify({ selectedCategories, customCategories, goals }),
     });
 
     if (!response.ok) {
@@ -109,6 +109,73 @@ export const userService = {
     if (!response.ok) {
       const data = await response.json();
       throw new Error(data.error || 'Failed to change password');
+    }
+
+    return response.json();
+  },
+
+  async getUserFocusAreas(token) {
+    const response = await fetch(`${API_URL}/users/focus-areas`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.error || 'Failed to fetch focus areas');
+    }
+
+    return response.json();
+  },
+
+  async updateFocusAreas(selectedCategories, customCategories, token) {
+    const response = await fetch(`${API_URL}/users/focus-areas`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ selectedCategories, customCategories }),
+    });
+
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.error || 'Failed to update focus areas');
+    }
+
+    return response.json();
+  },
+
+  async createCustomCategory(name, token) {
+    const response = await fetch(`${API_URL}/users/custom-categories`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ name }),
+    });
+
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.error || 'Failed to create custom category');
+    }
+
+    return response.json();
+  },
+
+  async deleteCustomCategory(categoryId, token) {
+    const response = await fetch(`${API_URL}/users/custom-categories/${categoryId}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.error || 'Failed to delete custom category');
     }
 
     return response.json();

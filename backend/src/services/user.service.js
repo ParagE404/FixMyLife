@@ -96,17 +96,29 @@ export const getOrCreateCategories = async () => {
   return await prisma.category.findMany({ orderBy: { order: 'asc' } });
 };
 
-export const completeOnboarding = async (userId, selectedCategories, goals) => {
+export const completeOnboarding = async (userId, selectedCategories, customCategories, goals) => {
   // Ensure categories exist
   await getOrCreateCategories();
   
-  // Get category IDs for selected categories
-  const categories = await prisma.category.findMany({
-    where: { name: { in: selectedCategories } }
+  // Create custom categories first
+  const customCategoryPromises = customCategories.map(categoryName => 
+    prisma.customCategory.create({
+      data: {
+        userId,
+        name: categoryName
+      }
+    })
+  );
+  
+  const createdCustomCategories = await Promise.all(customCategoryPromises);
+  
+  // Get category IDs for selected default categories
+  const defaultCategories = await prisma.category.findMany({
+    where: { name: { in: selectedCategories.filter(cat => !customCategories.includes(cat)) } }
   });
 
-  // Create goals for selected categories
-  const goalPromises = categories.map(category => {
+  // Create goals for selected default categories
+  const defaultGoalPromises = defaultCategories.map(category => {
     const goalDescription = goals[category.name];
     if (goalDescription) {
       return prisma.goal.create({
@@ -124,7 +136,26 @@ export const completeOnboarding = async (userId, selectedCategories, goals) => {
     return null;
   }).filter(Boolean);
 
-  await Promise.all(goalPromises);
+  // Create goals for custom categories
+  const customGoalPromises = createdCustomCategories.map(category => {
+    const goalDescription = goals[category.name];
+    if (goalDescription) {
+      return prisma.goal.create({
+        data: {
+          userId,
+          title: `${category.name} Goal`,
+          description: goalDescription,
+          targetHours: 7, // Default 1 hour per day
+          customCategoryId: category.id,
+          startDate: new Date(),
+          status: 'active'
+        }
+      });
+    }
+    return null;
+  }).filter(Boolean);
+
+  await Promise.all([...defaultGoalPromises, ...customGoalPromises]);
 
   // Mark onboarding as completed
   const user = await prisma.user.update({
@@ -139,4 +170,102 @@ export const completeOnboarding = async (userId, selectedCategories, goals) => {
   });
 
   return user;
+};
+
+export const getUserFocusAreas = async (userId) => {
+  const [defaultCategories, customCategories, userGoals] = await Promise.all([
+    prisma.category.findMany({ orderBy: { order: 'asc' } }),
+    prisma.customCategory.findMany({ 
+      where: { userId },
+      orderBy: { createdAt: 'asc' }
+    }),
+    prisma.goal.findMany({
+      where: { userId, status: 'active' },
+      include: {
+        category: true,
+        customCategory: true
+      }
+    })
+  ]);
+
+  // Get selected categories from active goals
+  const selectedDefaultCategories = userGoals
+    .filter(goal => goal.categoryId)
+    .map(goal => goal.category.name);
+    
+  const selectedCustomCategories = userGoals
+    .filter(goal => goal.customCategoryId)
+    .map(goal => goal.customCategory.name);
+
+  return {
+    defaultCategories,
+    customCategories,
+    selectedCategories: [...selectedDefaultCategories, ...selectedCustomCategories]
+  };
+};
+
+export const updateUserFocusAreas = async (userId, selectedCategories, customCategories) => {
+  // Ensure default categories exist
+  await getOrCreateCategories();
+  
+  // Get current custom categories for this user
+  const existingCustomCategories = await prisma.customCategory.findMany({
+    where: { userId }
+  });
+  
+  // Create new custom categories
+  const newCustomCategories = customCategories.filter(
+    name => !existingCustomCategories.some(cat => cat.name === name)
+  );
+  
+  const createPromises = newCustomCategories.map(name =>
+    prisma.customCategory.create({
+      data: { userId, name }
+    })
+  );
+  
+  await Promise.all(createPromises);
+  
+  // Remove custom categories that are no longer selected
+  const categoriesToRemove = existingCustomCategories.filter(
+    cat => !customCategories.includes(cat.name)
+  );
+  
+  const deletePromises = categoriesToRemove.map(cat =>
+    prisma.customCategory.delete({
+      where: { id: cat.id }
+    })
+  );
+  
+  await Promise.all(deletePromises);
+  
+  return { success: true };
+};
+
+export const createCustomCategory = async (userId, name) => {
+  const category = await prisma.customCategory.create({
+    data: {
+      userId,
+      name
+    }
+  });
+  
+  return category;
+};
+
+export const deleteCustomCategory = async (userId, categoryId) => {
+  // Verify the category belongs to the user
+  const category = await prisma.customCategory.findFirst({
+    where: { id: categoryId, userId }
+  });
+  
+  if (!category) {
+    throwError('Custom category not found', 404);
+  }
+  
+  await prisma.customCategory.delete({
+    where: { id: categoryId }
+  });
+  
+  return { success: true };
 };

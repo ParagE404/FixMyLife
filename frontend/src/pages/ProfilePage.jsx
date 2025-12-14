@@ -36,6 +36,7 @@ export function ProfilePage() {
   };
 
   const settingsItems = [
+    { icon: Settings, label: 'Focus Areas', description: 'Manage your tracking categories', action: 'navigate', path: '/settings' },
     { icon: User, label: 'Edit Profile', description: 'Update your personal information', modal: 'editProfile' },
     { icon: Lock, label: 'Change Password', description: 'Update your account security', modal: 'changePassword' },
     { icon: Bell, label: 'Notifications', description: 'Manage your notification preferences', modal: 'notifications' },
@@ -44,6 +45,14 @@ export function ProfilePage() {
 
   const openModal = (modalType) => {
     setActiveModal(modalType);
+  };
+
+  const handleItemClick = (item) => {
+    if (item.action === 'navigate') {
+      navigate(item.path);
+    } else if (item.modal) {
+      openModal(item.modal);
+    }
   };
 
   const closeModal = () => {
@@ -111,7 +120,7 @@ export function ProfilePage() {
                   key={index}
                   variant="ghost"
                   className="w-full justify-start h-auto p-4"
-                  onClick={() => openModal(item.modal)}
+                  onClick={() => handleItemClick(item)}
                 >
                   <div className="flex items-center gap-3 flex-1">
                     <IconComponent className="w-5 h-5 text-muted-foreground" />

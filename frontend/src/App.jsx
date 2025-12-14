@@ -11,6 +11,7 @@ import { ActivityPage } from './pages/ActivityPage';
 import { ActivitiesHistoryPage } from './pages/ActivitiesHistoryPage';
 import { GoalsPage } from './pages/GoalsPage';
 import { ProfilePage } from './pages/ProfilePage';
+import { SettingsPage } from './pages/SettingsPage';
 
 function AppContent() {
   const location = useLocation();
@@ -66,6 +67,14 @@ function AppContent() {
           element={
             <PrivateRoute>
               <ProfilePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <PrivateRoute>
+              <SettingsPage />
             </PrivateRoute>
           }
         />

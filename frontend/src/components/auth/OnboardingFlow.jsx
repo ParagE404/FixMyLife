@@ -14,6 +14,8 @@ const DEFAULT_CATEGORIES = [
 export function OnboardingFlow() {
   const [step, setStep] = useState(1);
   const [selectedCategories, setSelectedCategories] = useState([]);
+  const [customCategories, setCustomCategories] = useState([]);
+  const [newCategoryName, setNewCategoryName] = useState('');
   const [goals, setGoals] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -28,6 +30,20 @@ export function OnboardingFlow() {
     );
   };
 
+  const addCustomCategory = () => {
+    if (newCategoryName.trim() && !customCategories.includes(newCategoryName.trim())) {
+      const categoryName = newCategoryName.trim();
+      setCustomCategories((prev) => [...prev, categoryName]);
+      setSelectedCategories((prev) => [...prev, categoryName]);
+      setNewCategoryName('');
+    }
+  };
+
+  const removeCustomCategory = (category) => {
+    setCustomCategories((prev) => prev.filter((c) => c !== category));
+    setSelectedCategories((prev) => prev.filter((c) => c !== category));
+  };
+
   const handleGoalChange = (category, value) => {
     setGoals((prev) => ({ ...prev, [category]: value }));
   };
@@ -37,7 +53,12 @@ export function OnboardingFlow() {
       setLoading(true);
       setError('');
       
-      const updatedUser = await userService.completeOnboarding(selectedCategories, goals, token);
+      const updatedUser = await userService.completeOnboarding(
+        selectedCategories, 
+        customCategories, 
+        goals, 
+        token
+      );
       setUser(updatedUser);
       
       navigate('/dashboard');
@@ -75,6 +96,44 @@ export function OnboardingFlow() {
                   <span className="ml-3 font-medium">{category}</span>
                 </label>
               ))}
+              
+              {customCategories.map((category) => (
+                <div key={category} className="flex items-center p-3 border border-green-200 bg-green-50 rounded-lg">
+                  <input
+                    type="checkbox"
+                    checked={selectedCategories.includes(category)}
+                    onChange={() => toggleCategory(category)}
+                    className="w-5 h-5"
+                  />
+                  <span className="ml-3 font-medium flex-1">{category}</span>
+                  <button
+                    onClick={() => removeCustomCategory(category)}
+                    className="text-red-500 hover:text-red-700 text-sm"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-4 p-3 border-2 border-dashed border-gray-300 rounded-lg">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Add custom focus area..."
+                  value={newCategoryName}
+                  onChange={(e) => setNewCategoryName(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && addCustomCategory()}
+                  className="flex-1 px-3 py-2 border rounded-lg text-sm"
+                />
+                <button
+                  onClick={addCustomCategory}
+                  disabled={!newCategoryName.trim()}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600 disabled:opacity-50"
+                >
+                  Add
+                </button>
+              </div>
             </div>
 
             <button
@@ -82,7 +141,7 @@ export function OnboardingFlow() {
                 if (selectedCategories.length > 0) setStep(2);
               }}
               disabled={selectedCategories.length === 0}
-              className="w-full mt-6 py-2 bg-primary text-white rounded-lg font-medium hover:bg-opacity-90 disabled:opacity-50"
+              className="w-full mt-6 py-2 bg-green-500 text-white rounded-lg font-medium hover:bg-green-600 disabled:opacity-50 disabled:bg-gray-300"
             >
               Next
             </button>
@@ -112,14 +171,14 @@ export function OnboardingFlow() {
             <div className="flex gap-3 mt-6">
               <button
                 onClick={() => setStep(1)}
-                className="flex-1 py-2 border border-primary text-primary rounded-lg font-medium hover:bg-blue-50"
+                className="flex-1 py-2 border border-green-500 text-green-600 rounded-lg font-medium hover:bg-green-50"
               >
                 Back
               </button>
               <button
                 onClick={handleComplete}
                 disabled={loading}
-                className="flex-1 py-2 bg-primary text-white rounded-lg font-medium hover:bg-opacity-90 disabled:opacity-50"
+                className="flex-1 py-2 bg-green-500 text-white rounded-lg font-medium hover:bg-green-600 disabled:opacity-50 disabled:bg-gray-300"
               >
                 {loading ? 'Saving...' : 'Start Tracking'}
               </button>

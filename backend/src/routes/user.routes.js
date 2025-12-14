@@ -8,6 +8,10 @@ import {
   getDefaultCategories,
   getOrCreateCategories,
   completeOnboarding,
+  getUserFocusAreas,
+  updateUserFocusAreas,
+  createCustomCategory,
+  deleteCustomCategory,
 } from '../services/user.service.js';
 
 const router = express.Router();
@@ -66,9 +70,52 @@ router.get('/categories', async (req, res, next) => {
 // Complete onboarding
 router.post('/complete-onboarding', authenticateUser, async (req, res, next) => {
   try {
-    const { selectedCategories, goals } = req.body;
-    const user = await completeOnboarding(req.userId, selectedCategories, goals);
+    const { selectedCategories, customCategories = [], goals } = req.body;
+    const user = await completeOnboarding(req.userId, selectedCategories, customCategories, goals);
     res.json(user);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Get user focus areas
+router.get('/focus-areas', authenticateUser, async (req, res, next) => {
+  try {
+    const focusAreas = await getUserFocusAreas(req.userId);
+    res.json(focusAreas);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Update user focus areas
+router.put('/focus-areas', authenticateUser, async (req, res, next) => {
+  try {
+    const { selectedCategories, customCategories = [] } = req.body;
+    const result = await updateUserFocusAreas(req.userId, selectedCategories, customCategories);
+    res.json(result);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Create custom category
+router.post('/custom-categories', authenticateUser, async (req, res, next) => {
+  try {
+    const { name } = req.body;
+    const category = await createCustomCategory(req.userId, name);
+    res.json(category);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Delete custom category
+router.delete('/custom-categories/:categoryId', authenticateUser, async (req, res, next) => {
+  try {
+    const { categoryId } = req.params;
+    const result = await deleteCustomCategory(req.userId, categoryId);
+    res.json(result);
   } catch (error) {
     next(error);
   }
