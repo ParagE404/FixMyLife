@@ -1,6 +1,6 @@
 import express from 'express';
 import { validate, loginSchema, registerSchema } from '../middleware/validation.js';
-import { registerUser, loginUser, refreshAccessToken, logoutUser } from '../services/auth.service.js';
+import { registerUser, loginUser, refreshAccessToken, logoutUser, changePassword } from '../services/auth.service.js';
 import { authenticateUser } from '../middleware/auth.js';
 import { throwError } from '../middleware/errorHandler.js';
 
@@ -51,6 +51,26 @@ router.post('/logout', authenticateUser, async (req, res, next) => {
     const { refreshToken } = req.body;
     await logoutUser(req.userId, refreshToken);
     res.json({ message: 'Logged out successfully' });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Change Password
+router.post('/change-password', authenticateUser, async (req, res, next) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    
+    if (!currentPassword || !newPassword) {
+      throwError('Current password and new password are required', 400);
+    }
+    
+    if (newPassword.length < 6) {
+      throwError('New password must be at least 6 characters long', 400);
+    }
+    
+    const result = await changePassword(req.userId, currentPassword, newPassword);
+    res.json(result);
   } catch (error) {
     next(error);
   }

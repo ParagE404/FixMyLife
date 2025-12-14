@@ -298,3 +298,36 @@ select {
 .border-gray-200 {
   border-color: #e5e7eb !important;
 }
+
+/* Modal and Dialog Enhancements */
+[data-radix-dialog-overlay] {
+  background-color: rgba(0, 0, 0, 0.75) !important;
+  backdrop-filter: blur(4px) !important;
+  z-index: 99 !important;
+}
+
+[data-radix-dialog-content] {
+  background-color: white !important;
+  border: 1px solid #e5e7eb !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+  z-index: 100 !important;
+}
+
+.dark [data-radix-dialog-content] {
+  background-color: #1f2937 !important;
+  border-color: #374151 !important;
+  color: #f9fafb !important;
+}
+
+/* Ensure modal content is always visible */
+.modal-content {
+  background-color: white !important;
+  border: 1px solid #e5e7eb !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+}
+
+.dark .modal-content {
+  background-color: #1f2937 !important;
+  border-color: #374151 !important;
+  color: #f9fafb !important;
+}

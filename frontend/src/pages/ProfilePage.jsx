@@ -5,6 +5,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
 import { Separator } from '../components/ui/separator';
+import { EditProfileModal } from '../components/profile/EditProfileModal';
+import { ChangePasswordModal } from '../components/profile/ChangePasswordModal';
+import { NotificationsModal } from '../components/profile/NotificationsModal';
+import { PrivacyModal } from '../components/profile/PrivacyModal';
 import { 
   User, 
   Mail, 
@@ -23,6 +27,7 @@ export function ProfilePage() {
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [activeModal, setActiveModal] = useState(null);
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
@@ -31,11 +36,19 @@ export function ProfilePage() {
   };
 
   const settingsItems = [
-    { icon: User, label: 'Edit Profile', description: 'Update your personal information' },
-    { icon: Lock, label: 'Change Password', description: 'Update your account security' },
-    { icon: Bell, label: 'Notifications', description: 'Manage your notification preferences' },
-    { icon: Shield, label: 'Privacy', description: 'Control your data and privacy settings' },
+    { icon: User, label: 'Edit Profile', description: 'Update your personal information', modal: 'editProfile' },
+    { icon: Lock, label: 'Change Password', description: 'Update your account security', modal: 'changePassword' },
+    { icon: Bell, label: 'Notifications', description: 'Manage your notification preferences', modal: 'notifications' },
+    { icon: Shield, label: 'Privacy', description: 'Control your data and privacy settings', modal: 'privacy' },
   ];
+
+  const openModal = (modalType) => {
+    setActiveModal(modalType);
+  };
+
+  const closeModal = () => {
+    setActiveModal(null);
+  };
 
   return (
     <div className="min-h-screen bg-background p-4 pb-24">
@@ -98,7 +111,7 @@ export function ProfilePage() {
                   key={index}
                   variant="ghost"
                   className="w-full justify-start h-auto p-4"
-                  onClick={() => {/* TODO: Implement navigation */}}
+                  onClick={() => openModal(item.modal)}
                 >
                   <div className="flex items-center gap-3 flex-1">
                     <IconComponent className="w-5 h-5 text-muted-foreground" />
@@ -170,6 +183,24 @@ export function ProfilePage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Modals */}
+      <EditProfileModal 
+        isOpen={activeModal === 'editProfile'} 
+        onClose={closeModal} 
+      />
+      <ChangePasswordModal 
+        isOpen={activeModal === 'changePassword'} 
+        onClose={closeModal} 
+      />
+      <NotificationsModal 
+        isOpen={activeModal === 'notifications'} 
+        onClose={closeModal} 
+      />
+      <PrivacyModal 
+        isOpen={activeModal === 'privacy'} 
+        onClose={closeModal} 
+      />
     </div>
   );
 }

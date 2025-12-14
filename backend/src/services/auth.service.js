@@ -116,6 +116,35 @@ export const refreshAccessToken = async (refreshToken) => {
   return { accessToken: newAccessToken };
 };
 
+export const changePassword = async (userId, currentPassword, newPassword) => {
+  // Get user with password
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true, password: true },
+  });
+
+  if (!user) {
+    throwError('User not found', 404);
+  }
+
+  // Verify current password
+  const passwordMatch = await bcrypt.compare(currentPassword, user.password);
+  if (!passwordMatch) {
+    throwError('Current password is incorrect', 400);
+  }
+
+  // Hash new password
+  const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+  // Update password
+  await prisma.user.update({
+    where: { id: userId },
+    data: { password: hashedNewPassword },
+  });
+
+  return { message: 'Password updated successfully' };
+};
+
 export const logoutUser = async (userId, refreshToken) => {
   // Delete session token
   await prisma.sessionToken.deleteMany({

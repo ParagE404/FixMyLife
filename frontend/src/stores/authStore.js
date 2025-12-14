@@ -82,6 +82,7 @@ export const useAuthStore = create(
       },
 
       setUser: (user) => set({ user }),
+      updateUser: (userData) => set((state) => ({ user: { ...state.user, ...userData } })),
       clearError: () => set({ error: null }),
     }),
     {
