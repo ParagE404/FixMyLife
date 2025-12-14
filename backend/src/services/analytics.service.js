@@ -94,18 +94,22 @@ export const getCategoryBreakdown = async (userId, days = 7) => {
           gte: startDate,
         },
       },
-      include: { category: true },
+      include: { 
+        category: true,
+        customCategory: true 
+      },
     });
 
     const categoryData = {};
 
     activities.forEach((activity) => {
-      const catName = activity.category?.name || 'Other';
+      const catName = activity.category?.name || activity.customCategory?.name || 'Other';
       if (!categoryData[catName]) {
         categoryData[catName] = {
           name: catName,
           hours: 0,
           count: 0,
+          color: getCategoryColor(catName), // Add color for better visualization
         };
       }
 
@@ -303,33 +307,48 @@ export const getHabitStrength = async (userId) => {
     thirtyDaysAgo.setDate(today.getDate() - 30);
     thirtyDaysAgo.setHours(0, 0, 0, 0);
 
-    const dailyAggregates = await prisma.dailyAggregate.findMany({
+    // Get activities for the last 30 days
+    const activities = await prisma.activity.findMany({
       where: {
         userId,
-        date: {
+        startTime: {
           gte: thirtyDaysAgo,
         },
       },
     });
 
+    // Group activities by date
+    const dailyData = {};
+    activities.forEach((activity) => {
+      const dateKey = activity.startTime.toISOString().split('T')[0];
+      if (!dailyData[dateKey]) {
+        dailyData[dateKey] = {
+          activities: 0,
+          totalDuration: 0,
+        };
+      }
+      dailyData[dateKey].activities += 1;
+      dailyData[dateKey].totalDuration += getActivityDuration(activity);
+    });
+
     // Calculate consistency
-    const daysWithActivity = dailyAggregates.filter((d) => d.totalActivities > 0).length;
+    const daysWithActivity = Object.keys(dailyData).length;
     const consistencyScore = (daysWithActivity / 30) * 100;
 
     // Calculate average hours per day
-    const totalHours = dailyAggregates.reduce((sum, d) => sum + (d.totalDuration / 60 || 0), 0);
+    const totalHours = Object.values(dailyData).reduce((sum, day) => sum + (day.totalDuration / 60 || 0), 0);
     const avgHoursPerDay = totalHours / 30;
 
     // Calculate activity frequency
-    const totalActivities = dailyAggregates.reduce((sum, d) => sum + (d.totalActivities || 0), 0);
+    const totalActivities = Object.values(dailyData).reduce((sum, day) => sum + (day.activities || 0), 0);
     const avgActivitiesPerDay = totalActivities / 30;
 
     return {
       consistencyScore: Math.round(consistencyScore),
       daysWithActivity,
       totalDays: 30,
-      avgHoursPerDay: avgHoursPerDay.toFixed(1),
-      avgActivitiesPerDay: avgActivitiesPerDay.toFixed(1),
+      avgHoursPerDay: parseFloat(avgHoursPerDay.toFixed(1)),
+      avgActivitiesPerDay: parseFloat(avgActivitiesPerDay.toFixed(1)),
       level: getHabitLevel(consistencyScore),
     };
   } catch (error) {
@@ -402,4 +421,19 @@ function getHabitLevel(score) {
   if (score < 50) return 'Building';
   if (score < 75) return 'Established';
   return 'Mastered';
+}
+
+// Helper: Get category color
+function getCategoryColor(categoryName) {
+  const colors = [
+    '#2563eb', '#dc2626', '#059669', '#d97706', '#7c3aed',
+    '#db2777', '#0891b2', '#65a30d', '#dc2626', '#9333ea'
+  ];
+  
+  // Simple hash function to assign consistent colors
+  let hash = 0;
+  for (let i = 0; i < categoryName.length; i++) {
+    hash = categoryName.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return colors[Math.abs(hash) % colors.length];
 }

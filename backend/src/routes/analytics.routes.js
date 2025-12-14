@@ -27,7 +27,7 @@ router.get('/categories', authenticateUser, async (req, res, next) => {
   try {
     const { days = 7 } = req.query;
     const breakdown = await getCategoryBreakdown(req.userId, parseInt(days));
-    res.json(breakdown);
+    res.json({ categories: breakdown });
   } catch (error) {
     next(error);
   }
@@ -36,8 +36,43 @@ router.get('/categories', authenticateUser, async (req, res, next) => {
 // Get 4-week trends
 router.get('/trends', authenticateUser, async (req, res, next) => {
   try {
-    const trends = await getFourWeekTrends(req.userId);
-    res.json(trends);
+    const weeklyData = await getFourWeekTrends(req.userId);
+    
+    // Calculate trends from weekly data
+    let weeklyChange = 0;
+    let monthlyAverage = 0;
+    let bestDay = 'N/A';
+    let consistency = 0;
+    
+    if (weeklyData.length >= 2) {
+      const currentWeek = weeklyData[weeklyData.length - 1];
+      const previousWeek = weeklyData[weeklyData.length - 2];
+      
+      if (previousWeek.totalHours > 0) {
+        weeklyChange = ((currentWeek.totalHours - previousWeek.totalHours) / previousWeek.totalHours) * 100;
+      }
+    }
+    
+    if (weeklyData.length > 0) {
+      monthlyAverage = weeklyData.reduce((sum, week) => sum + week.totalHours, 0) / weeklyData.length;
+      
+      // Find best performing week
+      const bestWeek = weeklyData.reduce((best, week) => 
+        week.totalHours > best.totalHours ? week : best, weeklyData[0]);
+      bestDay = new Date(bestWeek.week).toLocaleDateString('en-US', { weekday: 'long' });
+      
+      // Calculate consistency (weeks with activity / total weeks)
+      const weeksWithActivity = weeklyData.filter(week => week.totalHours > 0).length;
+      consistency = (weeksWithActivity / weeklyData.length) * 100;
+    }
+    
+    res.json({
+      weeklyChange,
+      monthlyAverage,
+      bestDay,
+      consistency,
+      weeklyData
+    });
   } catch (error) {
     next(error);
   }
@@ -79,7 +114,14 @@ router.get('/history', authenticateUser, async (req, res, next) => {
 router.get('/habit-strength', authenticateUser, async (req, res, next) => {
   try {
     const strength = await getHabitStrength(req.userId);
-    res.json(strength);
+    res.json({
+      score: strength.consistencyScore,
+      message: strength.level,
+      daysWithActivity: strength.daysWithActivity,
+      totalDays: strength.totalDays,
+      avgHoursPerDay: strength.avgHoursPerDay,
+      avgActivitiesPerDay: strength.avgActivitiesPerDay
+    });
   } catch (error) {
     next(error);
   }
