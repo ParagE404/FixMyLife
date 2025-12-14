@@ -42,12 +42,20 @@ export function TextActivityInput({ onActivitiesCreated }) {
     }
   };
 
-  const handleConfirm = () => {
-    if (onActivitiesCreated) {
-      onActivitiesCreated(parsedActivities);
+  const handleConfirm = async () => {
+    try {
+      setIsLoading(true);
+      // The activities are already created by parseActivities, so we just need to notify
+      if (onActivitiesCreated) {
+        onActivitiesCreated(parsedActivities);
+      }
+      setInput("");
+      setParsedActivities([]);
+    } catch (error) {
+      setError('Failed to save activities');
+    } finally {
+      setIsLoading(false);
     }
-    setInput("");
-    setParsedActivities([]);
   };
 
   const handleEdit = (index, field, value) => {

@@ -7,6 +7,7 @@ import { RegisterPage } from './pages/RegisterPage';
 import { OnboardingPage } from './pages/OnboardingPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { ActivityPage } from './pages/ActivityPage';
+import { ActivitiesHistoryPage } from './pages/ActivitiesHistoryPage';
 import { GoalsPage } from './pages/GoalsPage';
 import { ProfilePage } from './pages/ProfilePage';
 
@@ -40,6 +41,14 @@ function AppContent() {
           element={
             <PrivateRoute>
               <ActivityPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/history"
+          element={
+            <PrivateRoute>
+              <ActivitiesHistoryPage />
             </PrivateRoute>
           }
         />

@@ -4,10 +4,13 @@ import { VoiceActivityInput } from '../components/activity/VoiceActivityInput';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Badge } from '../components/ui/badge';
-import { PenTool, Mic, CheckCircle } from 'lucide-react';
+import { PenTool, Mic, CheckCircle, History } from 'lucide-react';
+import { Button } from '../components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 export function ActivityPage() {
   const [message, setMessage] = useState('');
+  const navigate = useNavigate();
 
   const handleActivitiesCreated = (activities) => {
     setMessage(`Created ${activities.length} activities!`);
@@ -30,6 +33,16 @@ export function ActivityPage() {
               Describe your day and we'll categorize it for you automatically
             </CardDescription>
           </CardHeader>
+          <CardContent className="pt-0">
+            <Button 
+              onClick={() => navigate('/history')} 
+              variant="outline" 
+              className="w-full"
+            >
+              <History className="w-4 h-4 mr-2" />
+              View Activity History
+            </Button>
+          </CardContent>
         </Card>
 
         {/* Success Message */}
@@ -37,6 +50,14 @@ export function ActivityPage() {
           <Badge variant="success" className="w-full justify-center py-3 text-sm">
             <CheckCircle className="w-4 h-4 mr-2" />
             {message}
+            <Button 
+              onClick={() => navigate('/history')} 
+              variant="ghost" 
+              size="sm" 
+              className="ml-2 text-xs"
+            >
+              View History
+            </Button>
           </Badge>
         )}
 

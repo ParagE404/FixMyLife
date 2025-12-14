@@ -6,7 +6,8 @@ import {
   PenTool, 
   Target, 
   User,
-  Home
+  Home,
+  History
 } from 'lucide-react';
 
 export function MobileNav() {
@@ -15,7 +16,8 @@ export function MobileNav() {
 
   const navItems = [
     { path: '/dashboard', label: 'Dashboard', icon: BarChart3 },
-    { path: '/activities', label: 'Activities', icon: PenTool },
+    { path: '/activities', label: 'Log', icon: PenTool },
+    { path: '/history', label: 'History', icon: History },
     { path: '/goals', label: 'Goals', icon: Target },
     { path: '/profile', label: 'Profile', icon: User },
   ];
@@ -24,7 +26,7 @@ export function MobileNav() {
 
   return (
     <Card className="fixed bottom-4 left-4 right-4 md:hidden border-0 shadow-xl glass card-elevated">
-      <div className="grid grid-cols-4 gap-1 p-2">
+      <div className="grid grid-cols-5 gap-1 p-2">
         {navItems.map((item) => {
           const IconComponent = item.icon;
           const active = isActive(item.path);
