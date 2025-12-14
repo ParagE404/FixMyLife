@@ -127,8 +127,8 @@ export function DashboardPage() {
           />
           <StatsCard
             title="Trend"
-            value={trendsData?.weeklyChange >= 0 ? '+' : ''}
-            unit={`${trendsData?.weeklyChange?.toFixed(1) || '0'}%`}
+            value={`${trendsData?.weeklyChange >= 0 ? '+' : ''}${trendsData?.weeklyChange?.toFixed(1) || '0'}`}
+            unit="%"
             description="vs last week"
             icon={<TrendingUp className="w-4 h-4" />}
           />
@@ -188,9 +188,9 @@ function StatsCard({ title, value, unit, description, icon }) {
       <CardContent>
         <div className="text-2xl font-bold">
           {value}
-          <span className="text-sm font-normal text-muted-foreground ml-1">{unit}</span>
+          {unit && <span className="text-sm font-normal text-muted-foreground ml-1">{unit}</span>}
         </div>
-        <p className="text-xs text-muted-foreground">{description}</p>
+        <p className="text-xs text-muted-foreground mt-1">{description}</p>
       </CardContent>
     </Card>
   );

@@ -191,12 +191,26 @@ export const createActivity = async (userId, activityData) => {
 };
 
 export const getActivities = async (userId, filters = {}) => {
-  const { categoryId, startDate, endDate, search, limit = 50, offset = 0 } = filters;
+  const { categoryId, category, startDate, endDate, search, limit = 50, offset = 0, sort = 'newest' } = filters;
 
   const where = { userId };
 
   if (categoryId) {
     where.categoryId = categoryId;
+  } else if (category) {
+    // Filter by category name
+    where.OR = [
+      {
+        category: {
+          name: category
+        }
+      },
+      {
+        customCategory: {
+          name: category
+        }
+      }
+    ];
   }
 
   if (startDate || endDate) {
@@ -215,6 +229,15 @@ export const getActivities = async (userId, filters = {}) => {
     };
   }
 
+  // Determine sort order
+  let orderBy = { startTime: 'desc' }; // default: newest first
+  
+  if (sort === 'oldest') {
+    orderBy = { startTime: 'asc' };
+  } else if (sort === 'duration') {
+    orderBy = { duration: 'desc' };
+  }
+
   const activities = await prisma.activity.findMany({
     where,
     include: {
@@ -224,7 +247,7 @@ export const getActivities = async (userId, filters = {}) => {
         select: { id: true, email: true, name: true },
       },
     },
-    orderBy: { startTime: 'desc' },
+    orderBy,
     take: limit,
     skip: offset,
   });

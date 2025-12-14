@@ -11,10 +11,8 @@ import {
   History, 
   Search, 
   Filter, 
-  Calendar, 
-  Clock,
+  Calendar,
   RefreshCw,
-  ListFilter,
   SortDesc
 } from 'lucide-react';
 
@@ -36,8 +34,28 @@ export function ActivitiesHistoryPage() {
       const filters = {};
       if (searchTerm) filters.search = searchTerm;
       if (selectedCategory) filters.category = selectedCategory;
-      if (dateFilter !== 'all') filters.period = dateFilter;
       if (sortBy) filters.sort = sortBy;
+      
+      // Handle date filtering
+      if (dateFilter !== 'all') {
+        const now = new Date();
+        if (dateFilter === 'today') {
+          const today = new Date(now);
+          today.setHours(0, 0, 0, 0);
+          const tomorrow = new Date(today);
+          tomorrow.setDate(tomorrow.getDate() + 1);
+          filters.startDate = today.toISOString();
+          filters.endDate = tomorrow.toISOString();
+        } else if (dateFilter === 'week') {
+          const weekStart = new Date(now);
+          weekStart.setDate(now.getDate() - now.getDay());
+          weekStart.setHours(0, 0, 0, 0);
+          filters.startDate = weekStart.toISOString();
+        } else if (dateFilter === 'month') {
+          const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+          filters.startDate = monthStart.toISOString();
+        }
+      }
 
       const activities = await activityService.getActivities(filters, token);
       setActivities(activities || []);
@@ -278,14 +296,20 @@ export function ActivitiesHistoryPage() {
                     </Badge>
                   </div>
                   <div className="grid gap-3">
-                    {dayActivities.map((activity) => (
-                      <ActivityCard
-                        key={activity.id}
-                        activity={activity}
-                        onUpdate={handleActivityUpdate}
-                        onDelete={handleActivityDelete}
-                      />
-                    ))}
+                    {dayActivities
+                      .sort((a, b) => {
+                        const timeA = new Date(a.startTime || a.createdAt);
+                        const timeB = new Date(b.startTime || b.createdAt);
+                        return sortBy === 'oldest' ? timeA - timeB : timeB - timeA;
+                      })
+                      .map((activity) => (
+                        <ActivityCard
+                          key={activity.id}
+                          activity={activity}
+                          onUpdate={handleActivityUpdate}
+                          onDelete={handleActivityDelete}
+                        />
+                      ))}
                   </div>
                 </div>
               ))}

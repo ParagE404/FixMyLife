@@ -55,13 +55,15 @@ router.post('/manual', authenticateUser, async (req, res, next) => {
 // Get activities with filters
 router.get('/', authenticateUser, async (req, res, next) => {
   try {
-    const { categoryId, startDate, endDate, search, limit, offset } = req.query;
+    const { categoryId, category, startDate, endDate, search, limit, offset, sort } = req.query;
 
     const activities = await getActivities(req.userId, {
       categoryId,
+      category,
       startDate,
       endDate,
       search,
+      sort,
       limit: parseInt(limit) || 50,
       offset: parseInt(offset) || 0,
     });

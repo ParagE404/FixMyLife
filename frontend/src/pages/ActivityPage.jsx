@@ -1,36 +1,34 @@
-import { useState } from 'react';
-import { TextActivityInput } from '../components/activity/TextActivityInput';
-import { VoiceActivityInput } from '../components/activity/VoiceActivityInput';
+import React from 'react';
+import { ImprovedActivityInput } from '../components/activity/ImprovedActivityInput';
+import { ActivityOnboarding } from '../components/activity/ActivityOnboarding';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Badge } from '../components/ui/badge';
-import { PenTool, Mic, CheckCircle, History } from 'lucide-react';
+import { PenTool, CheckCircle, History, Sparkles } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { useNavigate } from 'react-router-dom';
 
 export function ActivityPage() {
-  const [message, setMessage] = useState('');
   const navigate = useNavigate();
 
   const handleActivitiesCreated = (activities) => {
-    setMessage(`Created ${activities.length} activities!`);
-    setTimeout(() => setMessage(''), 3000);
+    // Optional: Show a toast or navigate to history
+    console.log('Activities created:', activities);
   };
 
   return (
     <div className="min-h-screen bg-background p-4 pb-24">
-      <div className="max-w-2xl mx-auto space-y-6">
+      <div className="max-w-2xl mx-auto space-y-6 animate-fade-in">
         {/* Header */}
         <Card className="glass card-elevated">
           <CardHeader>
             <CardTitle className="text-2xl flex items-center gap-2">
               <div className="p-2 rounded-lg bg-purple-100">
-                <PenTool className="w-6 h-6 text-purple-600" />
+                <Sparkles className="w-6 h-6 text-purple-600" />
               </div>
               Log Activities
             </CardTitle>
             <CardDescription>
-              Describe your day and we'll categorize it for you automatically
+              Multiple ways to track your activities - choose what works best for you
             </CardDescription>
           </CardHeader>
           <CardContent className="pt-0">
@@ -45,47 +43,11 @@ export function ActivityPage() {
           </CardContent>
         </Card>
 
-        {/* Success Message */}
-        {message && (
-          <Badge variant="success" className="w-full justify-center py-3 text-sm">
-            <CheckCircle className="w-4 h-4 mr-2" />
-            {message}
-            <Button 
-              onClick={() => navigate('/history')} 
-              variant="ghost" 
-              size="sm" 
-              className="ml-2 text-xs"
-            >
-              View History
-            </Button>
-          </Badge>
-        )}
+        {/* Improved Activity Input */}
+        <ImprovedActivityInput onActivitiesCreated={handleActivitiesCreated} />
 
-        {/* Activity Input Tabs */}
-        <Card>
-          <CardContent className="p-6">
-            <Tabs defaultValue="text" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="text" className="flex items-center gap-2">
-                  <PenTool className="w-4 h-4" />
-                  Text Input
-                </TabsTrigger>
-                <TabsTrigger value="voice" className="flex items-center gap-2">
-                  <Mic className="w-4 h-4" />
-                  Voice Input
-                </TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="text" className="mt-6">
-                <TextActivityInput onActivitiesCreated={handleActivitiesCreated} />
-              </TabsContent>
-              
-              <TabsContent value="voice" className="mt-6">
-                <VoiceActivityInput onActivitiesCreated={handleActivitiesCreated} />
-              </TabsContent>
-            </Tabs>
-          </CardContent>
-        </Card>
+        {/* Onboarding */}
+        <ActivityOnboarding />
       </div>
     </div>
   );

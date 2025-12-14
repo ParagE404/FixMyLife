@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-route
 import { MobileWrapper } from './components/layout/MobileWrapper';
 import { MobileNav } from './components/layout/MobileNav';
 import { PrivateRoute } from './components/layout/PrivateRoute';
+import { ToastProvider } from './components/ui/toast';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { OnboardingPage } from './pages/OnboardingPage';
@@ -77,11 +78,13 @@ function AppContent() {
 
 function App() {
   return (
-    <MobileWrapper>
-      <BrowserRouter>
-        <AppContent />
-      </BrowserRouter>
-    </MobileWrapper>
+    <ToastProvider>
+      <MobileWrapper>
+        <BrowserRouter>
+          <AppContent />
+        </BrowserRouter>
+      </MobileWrapper>
+    </ToastProvider>
   );
 }
 
