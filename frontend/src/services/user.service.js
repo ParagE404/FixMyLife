@@ -180,4 +180,51 @@ export const userService = {
 
     return response.json();
   },
+
+  async exportUserData(token) {
+    const response = await fetch(`${API_URL}/users/export-data`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.error || 'Failed to export user data');
+    }
+
+    return response.json();
+  },
+
+  async clearUserData(token) {
+    const response = await fetch(`${API_URL}/users/clear-data`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.error || 'Failed to clear user data');
+    }
+
+    return response.json();
+  },
+
+  async deleteAccount(token) {
+    const response = await fetch(`${API_URL}/users/delete-account`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.error || 'Failed to delete account');
+    }
+
+    return response.json();
+  },
 };

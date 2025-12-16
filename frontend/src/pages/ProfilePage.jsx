@@ -36,7 +36,6 @@ export function ProfilePage() {
   };
 
   const settingsItems = [
-    { icon: Settings, label: 'Focus Areas', description: 'Manage your tracking categories', action: 'navigate', path: '/settings' },
     { icon: User, label: 'Edit Profile', description: 'Update your personal information', modal: 'editProfile' },
     { icon: Lock, label: 'Change Password', description: 'Update your account security', modal: 'changePassword' },
     { icon: Bell, label: 'Notifications', description: 'Manage your notification preferences', modal: 'notifications' },

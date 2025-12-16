@@ -12,6 +12,9 @@ import {
   updateUserFocusAreas,
   createCustomCategory,
   deleteCustomCategory,
+  exportUserData,
+  clearUserData,
+  deleteUserAccount,
 } from '../services/user.service.js';
 
 const router = express.Router();
@@ -115,6 +118,36 @@ router.delete('/custom-categories/:categoryId', authenticateUser, async (req, re
   try {
     const { categoryId } = req.params;
     const result = await deleteCustomCategory(req.userId, categoryId);
+    res.json(result);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Export user data
+router.get('/export-data', authenticateUser, async (req, res, next) => {
+  try {
+    const userData = await exportUserData(req.userId);
+    res.json(userData);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Clear all user data
+router.delete('/clear-data', authenticateUser, async (req, res, next) => {
+  try {
+    const result = await clearUserData(req.userId);
+    res.json(result);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Delete user account
+router.delete('/delete-account', authenticateUser, async (req, res, next) => {
+  try {
+    const result = await deleteUserAccount(req.userId);
     res.json(result);
   } catch (error) {
     next(error);

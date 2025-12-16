@@ -43,23 +43,49 @@ export const updateUserProfile = async (userId, data) => {
 };
 
 export const getUserPreferences = async (userId) => {
-  const preferences = await prisma.userPreferences.findUnique({
+  let preferences = await prisma.userPreferences.findUnique({
     where: { userId },
   });
 
+  // Create default preferences if they don't exist
   if (!preferences) {
-    throwError('Preferences not found', 404);
+    preferences = await prisma.userPreferences.create({
+      data: {
+        userId,
+        rememberMeEnabled: true,
+        notificationsEnabled: true,
+        dailyReminders: true,
+        weeklyReports: true,
+        goalAchievements: true,
+        streakAlerts: false,
+        emailNotifications: false,
+        theme: 'system',
+        accentColor: 'green',
+        categoryOrder: [],
+        hiddenCategories: [],
+      },
+    });
   }
 
   return preferences;
 };
 
 export const updateUserPreferences = async (userId, data) => {
+  // First ensure preferences exist
+  await getUserPreferences(userId);
+  
   const preferences = await prisma.userPreferences.update({
     where: { userId },
     data: {
       rememberMeEnabled: data.rememberMeEnabled,
       notificationsEnabled: data.notificationsEnabled,
+      dailyReminders: data.dailyReminders,
+      weeklyReports: data.weeklyReports,
+      goalAchievements: data.goalAchievements,
+      streakAlerts: data.streakAlerts,
+      emailNotifications: data.emailNotifications,
+      theme: data.theme,
+      accentColor: data.accentColor,
       categoryOrder: data.categoryOrder,
       hiddenCategories: data.hiddenCategories,
     },
@@ -268,4 +294,85 @@ export const deleteCustomCategory = async (userId, categoryId) => {
   });
   
   return { success: true };
+};
+
+export const exportUserData = async (userId) => {
+  const [user, activities, goals, customCategories, preferences] = await Promise.all([
+    prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        timezone: true,
+        createdAt: true,
+      }
+    }),
+    prisma.activity.findMany({
+      where: { userId },
+      include: {
+        category: true,
+        customCategory: true,
+      }
+    }),
+    prisma.goal.findMany({
+      where: { userId },
+      include: {
+        category: true,
+        customCategory: true,
+        progress: true,
+      }
+    }),
+    prisma.customCategory.findMany({
+      where: { userId }
+    }),
+    prisma.userPreferences.findUnique({
+      where: { userId }
+    })
+  ]);
+
+  return {
+    user,
+    activities,
+    goals,
+    customCategories,
+    preferences,
+    exportedAt: new Date().toISOString(),
+  };
+};
+
+export const clearUserData = async (userId) => {
+  // Delete all user data except the user account itself
+  await Promise.all([
+    prisma.activity.deleteMany({ where: { userId } }),
+    prisma.goal.deleteMany({ where: { userId } }),
+    prisma.customCategory.deleteMany({ where: { userId } }),
+    prisma.notification.deleteMany({ where: { userId } }),
+    prisma.insight.deleteMany({ where: { userId } }),
+    prisma.streak.deleteMany({ where: { userId } }),
+    prisma.milestone.deleteMany({ where: { userId } }),
+    prisma.dailyAggregate.deleteMany({ where: { userId } }),
+    prisma.weeklyAggregate.deleteMany({ where: { userId } }),
+    prisma.activitySuggestion.deleteMany({ where: { userId } }),
+    prisma.userPatterns.deleteMany({ where: { userId } }),
+    prisma.patternSuggestion.deleteMany({ where: { userId } }),
+    prisma.correlationAnalysis.deleteMany({ where: { userId } }),
+  ]);
+
+  // Reset user onboarding status
+  await prisma.user.update({
+    where: { id: userId },
+    data: { onboardingCompleted: false }
+  });
+
+  return { success: true, message: 'All user data cleared successfully' };
+};
+
+export const deleteUserAccount = async (userId) => {
+  // This will cascade delete all related data due to foreign key constraints
+  await prisma.user.delete({
+    where: { id: userId }
+  });
+
+  return { success: true, message: 'Account deleted successfully' };
 };

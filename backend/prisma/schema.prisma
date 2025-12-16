@@ -59,6 +59,13 @@ model UserPreferences {
   userId               String   @unique
   rememberMeEnabled    Boolean  @default(true)
   notificationsEnabled Boolean  @default(true)
+  dailyReminders       Boolean  @default(true)
+  weeklyReports        Boolean  @default(true)
+  goalAchievements     Boolean  @default(true)
+  streakAlerts         Boolean  @default(false)
+  emailNotifications   Boolean  @default(false)
+  theme                String   @default("system") // light, dark, system
+  accentColor          String   @default("green") // green, blue, purple, orange
   categoryOrder        String[] @default([]) // JSON array of category IDs
   hiddenCategories     String[] @default([]) // Categories hidden from UI
   createdAt            DateTime @default(now())

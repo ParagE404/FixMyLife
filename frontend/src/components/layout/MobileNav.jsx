@@ -8,6 +8,7 @@ import {
   User,
   Brain,
   Bell,
+  Settings,
   MoreHorizontal,
   X,
   Sparkles,
@@ -38,6 +39,12 @@ export function MobileNav() {
       label: 'Alerts', 
       icon: Bell,
       description: 'Habit risk predictions'
+    },
+    { 
+      path: '/settings', 
+      label: 'Settings', 
+      icon: Settings,
+      description: 'App preferences & account'
     },
   ];
 
