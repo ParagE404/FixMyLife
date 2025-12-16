@@ -107,68 +107,68 @@ const RiskAnalysisDashboard = ({ className = '' }) => {
   return (
     <div className={`bg-white rounded-lg shadow-sm border ${className}`}>
       {/* Header */}
-      <div className="p-6 border-b">
-        <div className="flex items-center justify-between">
+      <div className="p-4 md:p-6 border-b">
+        <div className="flex flex-col space-y-3 md:flex-row md:items-center md:justify-between md:space-y-0">
           <div className="flex items-center space-x-2">
-            <Brain className="w-6 h-6 text-blue-600" />
-            <h2 className="text-xl font-semibold text-gray-900">
+            <Brain className="w-5 h-5 md:w-6 md:h-6 text-blue-600" />
+            <h2 className="text-lg md:text-xl font-semibold text-gray-900">
               Habit Risk Analysis
             </h2>
           </div>
           
-          <div className="flex items-center space-x-3">
+          <div className="flex flex-col space-y-2 md:flex-row md:items-center md:space-y-0 md:space-x-3">
             {lastAnalyzed && (
-              <span className="text-sm text-gray-500">
+              <span className="text-xs md:text-sm text-gray-500">
                 Last updated: {formatDate(lastAnalyzed)}
               </span>
             )}
             <button
               onClick={handleRunAnalysis}
               disabled={isAnalyzing}
-              className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors"
+              className="flex items-center justify-center space-x-2 px-3 py-2 md:px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors text-sm"
             >
               <RefreshCw className={`w-4 h-4 ${isAnalyzing ? 'animate-spin' : ''}`} />
-              <span>{isAnalyzing ? 'Analyzing...' : 'Refresh Analysis'}</span>
+              <span>{isAnalyzing ? 'Analyzing...' : 'Refresh'}</span>
             </button>
           </div>
         </div>
       </div>
 
       {/* Summary Stats */}
-      <div className="p-6 border-b">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="p-4 md:p-6 border-b">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
           <div className="text-center">
-            <div className="text-2xl font-bold text-gray-900">
+            <div className="text-xl md:text-2xl font-bold text-gray-900">
               {riskSummary.totalCategories || 0}
             </div>
-            <div className="text-sm text-gray-500">Categories Analyzed</div>
+            <div className="text-xs md:text-sm text-gray-500">Categories</div>
           </div>
           
           <div className="text-center">
-            <div className="text-2xl font-bold text-red-600">
+            <div className="text-xl md:text-2xl font-bold text-red-600">
               {riskSummary.criticalRisk || 0}
             </div>
-            <div className="text-sm text-gray-500">Critical Risk</div>
+            <div className="text-xs md:text-sm text-gray-500">Critical</div>
           </div>
           
           <div className="text-center">
-            <div className="text-2xl font-bold text-orange-600">
+            <div className="text-xl md:text-2xl font-bold text-orange-600">
               {riskSummary.highRisk || 0}
             </div>
-            <div className="text-sm text-gray-500">High Risk</div>
+            <div className="text-xs md:text-sm text-gray-500">High Risk</div>
           </div>
           
           <div className="text-center">
-            <div className="text-2xl font-bold text-gray-900">
+            <div className="text-xl md:text-2xl font-bold text-gray-900">
               {riskSummary.averageRiskScore ? Math.round(riskSummary.averageRiskScore) : 0}%
             </div>
-            <div className="text-sm text-gray-500">Avg Risk Score</div>
+            <div className="text-xs md:text-sm text-gray-500">Avg Risk</div>
           </div>
         </div>
       </div>
 
       {/* Predictions */}
-      <div className="p-6">
+      <div className="p-4 md:p-6">
         {predictions.length === 0 ? (
           <div className="text-center py-8">
             <Target className="w-12 h-12 text-green-300 mx-auto mb-3" />
@@ -188,21 +188,35 @@ const RiskAnalysisDashboard = ({ className = '' }) => {
             {predictions.map((prediction, index) => (
               <div
                 key={index}
-                className={`border rounded-lg p-4 ${getRiskColor(prediction.riskLevel)}`}
+                className={`border rounded-lg p-3 md:p-4 ${getRiskColor(prediction.riskLevel)}`}
               >
-                <div className="flex items-start justify-between">
-                  <div className="flex items-start space-x-3">
+                <div className="flex flex-col space-y-3 md:flex-row md:items-start md:justify-between md:space-y-0">
+                  <div className="flex items-start space-x-3 flex-1">
                     {getRiskIcon(prediction.riskLevel)}
-                    <div className="flex-1">
-                      <h4 className="font-semibold text-sm">
-                        {prediction.categoryName}
-                      </h4>
-                      <p className="text-sm mt-1">
-                        {prediction.message}
-                      </p>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between md:block">
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-semibold text-sm md:text-base">
+                            {prediction.categoryName}
+                          </h4>
+                          <p className="text-xs md:text-sm mt-1 text-gray-700">
+                            {prediction.message}
+                          </p>
+                        </div>
+                        
+                        {/* Risk Score - Mobile */}
+                        <div className="text-right ml-3 md:hidden">
+                          <div className="text-lg font-bold">
+                            {Math.round(prediction.riskScore)}%
+                          </div>
+                          <div className="text-xs text-gray-500 uppercase tracking-wide">
+                            {prediction.riskLevel}
+                          </div>
+                        </div>
+                      </div>
                       
-                      {/* Metrics */}
-                      <div className="flex items-center space-x-4 mt-3 text-xs">
+                      {/* Metrics - Mobile Stacked */}
+                      <div className="grid grid-cols-2 gap-2 mt-3 text-xs md:flex md:items-center md:space-x-4 md:gap-0">
                         <div className="flex items-center space-x-1">
                           <span className="font-medium">Frequency:</span>
                           <span className={prediction.frequencyTrend < 0 ? 'text-red-600' : 'text-green-600'}>
@@ -223,9 +237,9 @@ const RiskAnalysisDashboard = ({ className = '' }) => {
                         </div>
                         
                         {prediction.daysSinceLastActivity > 0 && (
-                          <div className="flex items-center space-x-1">
-                            <span className="font-medium">Last activity:</span>
-                            <span>{prediction.daysSinceLastActivity} days ago</span>
+                          <div className="flex items-center space-x-1 col-span-2 md:col-span-1">
+                            <span className="font-medium">Last:</span>
+                            <span>{prediction.daysSinceLastActivity}d ago</span>
                           </div>
                         )}
                       </div>
@@ -239,7 +253,7 @@ const RiskAnalysisDashboard = ({ className = '' }) => {
                           <ul className="space-y-1">
                             {prediction.recommendations.slice(0, 2).map((rec, recIndex) => (
                               <li key={recIndex} className="text-xs text-gray-600 flex items-start">
-                                <span className="w-1 h-1 bg-gray-400 rounded-full mt-1.5 mr-2 flex-shrink-0"></span>
+                                <span className="w-1 h-1 bg-gray-400 rounded-full mt-1.5 mr-2 shrink-0"></span>
                                 {rec}
                               </li>
                             ))}
@@ -249,7 +263,8 @@ const RiskAnalysisDashboard = ({ className = '' }) => {
                     </div>
                   </div>
                   
-                  <div className="text-right">
+                  {/* Risk Score - Desktop */}
+                  <div className="text-right hidden md:block">
                     <div className="text-lg font-bold">
                       {Math.round(prediction.riskScore)}%
                     </div>
