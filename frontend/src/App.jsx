@@ -13,6 +13,7 @@ import { GoalsPage } from './pages/GoalsPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { SettingsPage } from './pages/SettingsPage';
 import PatternsPage from './pages/PatternsPage.jsx';
+import CorrelationsPage from './pages/CorrelationsPage.jsx';
 
 function AppContent() {
   const location = useLocation();
@@ -68,6 +69,14 @@ function AppContent() {
           element={
             <PrivateRoute>
               <PatternsPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/correlations"
+          element={
+            <PrivateRoute>
+              <CorrelationsPage />
             </PrivateRoute>
           }
         />

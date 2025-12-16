@@ -29,6 +29,13 @@ AI-powered habit formation application that helps users build positive habits an
 - **Pattern Insights**: Visualizes your behavioral patterns and habit consistency
 - **Smart Scheduling**: Recommends optimal times for activities based on your patterns
 
+### 🔗 Multi-Domain Habit Cross-Correlation
+- **Hidden Relationship Discovery**: Identifies correlations between different activity categories
+- **Statistical Analysis**: Uses Pearson correlation to find behavioral relationships
+- **Predictive Insights**: AI-powered predictions based on activity correlations
+- **Correlation Matrix**: Interactive heatmap visualization of all category relationships
+- **Actionable Recommendations**: Suggests optimizations based on discovered correlations
+
 ### 🔐 User Experience
 - **Secure Authentication**: JWT-based authentication with session management
 - **Mobile-First Design**: Responsive design optimized for mobile devices
@@ -169,6 +176,13 @@ VITE_API_URL="http://localhost:3000"
 - `GET /api/patterns/suggestions` - Get proactive habit suggestions
 - `POST /api/patterns/suggestions/:id/act` - Mark suggestion as acted upon
 - `GET /api/patterns/strength` - Get pattern strength score
+
+### Cross-Correlation Analysis
+- `GET /api/correlations/analyze` - Analyze cross-correlations between categories
+- `GET /api/correlations/summary` - Get correlation analysis summary
+- `GET /api/correlations/insights` - Get correlation insights and relationships
+- `GET /api/correlations/predictions` - Get predictive insights based on correlations
+- `GET /api/correlations/matrix` - Get correlation matrix for visualization
 
 ## Development
 

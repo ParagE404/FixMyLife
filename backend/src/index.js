@@ -7,6 +7,7 @@ import activityRoutes from './routes/activity.routes.js';
 import analyticsRoutes from './routes/analytics.routes.js';
 import goalsRoutes from './routes/goals.routes.js';
 import patternsRoutes from './routes/patterns.routes.js';
+import correlationsRoutes from './routes/correlations.routes.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { initializePatternScheduler } from './services/pattern-job.service.js';
 
@@ -29,6 +30,7 @@ app.use('/api/activities', activityRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/goals', goalsRoutes);
 app.use('/api/patterns', patternsRoutes);
+app.use('/api/correlations', correlationsRoutes);
 
 // 404 handler
 app.use((req, res) => {

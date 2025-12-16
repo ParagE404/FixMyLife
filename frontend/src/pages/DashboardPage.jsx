@@ -19,6 +19,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import PatternSuggestionsWidget from '../components/patterns/PatternSuggestionsWidget.jsx';
+import CorrelationWidget from '../components/correlations/CorrelationWidget.jsx';
 
 export function DashboardPage() {
   const { token } = useAuthStore();
@@ -153,6 +154,9 @@ export function DashboardPage() {
 
         {/* Pattern Suggestions Widget */}
         <PatternSuggestionsWidget />
+
+        {/* Correlation Widget */}
+        <CorrelationWidget />
 
         {/* Category Breakdown */}
         <div className="grid md:grid-cols-2 gap-6">
