@@ -1,12 +1,10 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Card } from '../ui/card';
-import { Badge } from '../ui/badge';
 import { 
   BarChart3, 
   PenTool, 
   Target, 
   User,
-  History,
   Brain
 } from 'lucide-react';
 
@@ -35,15 +33,15 @@ export function MobileNav() {
             <button
               key={item.path}
               onClick={() => navigate(item.path)}
-              className={`flex flex-col items-center gap-1 py-3 px-2 rounded-lg transition-all duration-200 ${
+              className={`flex flex-col items-center gap-1 py-3 px-1 rounded-lg transition-all duration-200 ${
                 active
                   ? 'bg-green-500 text-white shadow-lg shadow-green-500/30'
                   : 'text-gray-500 hover:text-green-600 hover:bg-green-50'
               }`}
             >
               <IconComponent className={`w-5 h-5 ${active ? 'scale-110' : ''} transition-transform`} />
-              <span className={`text-xs font-medium ${active ? 'font-semibold' : ''}`}>
-                {item.label}
+              <span className={`text-xs font-medium ${active ? 'font-semibold' : ''} text-center leading-tight`}>
+                {item.path === '/dashboard' ? 'Home' : item.label}
               </span>
               {active && (
                 <div className="w-1 h-1 bg-primary-foreground rounded-full mt-0.5" />
