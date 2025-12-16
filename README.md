@@ -22,6 +22,13 @@ AI-powered habit formation application that helps users build positive habits an
 - **AI Recommendations**: Personalized suggestions based on activity patterns
 - **Milestone Celebrations**: Achievement tracking and notifications
 
+### 🧠 Behavioral Pattern Recognition
+- **Temporal Pattern Analysis**: Learns when you typically do activities (e.g., "exercise at 7 AM")
+- **Deviation Detection**: Identifies when you deviate from established patterns
+- **Proactive Suggestions**: Automatically suggests habit resumption without explicit prompting
+- **Pattern Insights**: Visualizes your behavioral patterns and habit consistency
+- **Smart Scheduling**: Recommends optimal times for activities based on your patterns
+
 ### 🔐 User Experience
 - **Secure Authentication**: JWT-based authentication with session management
 - **Mobile-First Design**: Responsive design optimized for mobile devices
@@ -155,6 +162,13 @@ VITE_API_URL="http://localhost:3000"
 - `GET /api/analytics/weekly` - Weekly activity data
 - `GET /api/analytics/categories` - Category breakdown
 - `GET /api/analytics/trends` - Activity trends
+
+### Pattern Recognition
+- `GET /api/patterns/analyze` - Analyze user behavioral patterns
+- `GET /api/patterns/insights` - Get pattern insights for dashboard
+- `GET /api/patterns/suggestions` - Get proactive habit suggestions
+- `POST /api/patterns/suggestions/:id/act` - Mark suggestion as acted upon
+- `GET /api/patterns/strength` - Get pattern strength score
 
 ## Development
 

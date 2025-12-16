@@ -18,6 +18,7 @@ import {
   AlertCircle,
   Sparkles
 } from 'lucide-react';
+import PatternSuggestionsWidget from '../components/patterns/PatternSuggestionsWidget.jsx';
 
 export function DashboardPage() {
   const { token } = useAuthStore();
@@ -149,6 +150,9 @@ export function DashboardPage() {
             <WeeklyProgressBars data={weeklyData?.chartData || []} />
           </CardContent>
         </Card>
+
+        {/* Pattern Suggestions Widget */}
+        <PatternSuggestionsWidget />
 
         {/* Category Breakdown */}
         <div className="grid md:grid-cols-2 gap-6">

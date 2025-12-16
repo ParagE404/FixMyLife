@@ -12,6 +12,7 @@ import { ActivitiesHistoryPage } from './pages/ActivitiesHistoryPage';
 import { GoalsPage } from './pages/GoalsPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { SettingsPage } from './pages/SettingsPage';
+import PatternsPage from './pages/PatternsPage.jsx';
 
 function AppContent() {
   const location = useLocation();
@@ -59,6 +60,14 @@ function AppContent() {
           element={
             <PrivateRoute>
               <GoalsPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/patterns"
+          element={
+            <PrivateRoute>
+              <PatternsPage />
             </PrivateRoute>
           }
         />

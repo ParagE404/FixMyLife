@@ -6,8 +6,8 @@ import {
   PenTool, 
   Target, 
   User,
-  Home,
-  History
+  History,
+  Brain
 } from 'lucide-react';
 
 export function MobileNav() {
@@ -17,7 +17,7 @@ export function MobileNav() {
   const navItems = [
     { path: '/dashboard', label: 'Dashboard', icon: BarChart3 },
     { path: '/activities', label: 'Log', icon: PenTool },
-    { path: '/history', label: 'History', icon: History },
+    { path: '/patterns', label: 'Patterns', icon: Brain },
     { path: '/goals', label: 'Goals', icon: Target },
     { path: '/profile', label: 'Profile', icon: User },
   ];

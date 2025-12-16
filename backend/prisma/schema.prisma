@@ -34,6 +34,8 @@ model User {
   activitySuggestions ActivitySuggestion[]
   goals               Goal[]
   insights            Insight[]
+  patterns            UserPatterns?
+  patternSuggestions  PatternSuggestion[]
 
   @@index([email])
 }
@@ -280,6 +282,48 @@ model WeeklyAggregate {
   @@unique([userId, weekStart])
   @@index([userId])
   @@index([weekStart])
+}
+
+// ============================================
+// BEHAVIORAL PATTERN RECOGNITION
+// ============================================
+
+model UserPatterns {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  patterns     Json     // Stores detected patterns (daily, weekly, category, temporal)
+  lastAnalyzed DateTime @default(now())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([lastAnalyzed])
+}
+
+model PatternSuggestion {
+  id          String   @id @default(cuid())
+  userId      String
+  type        String   // 'habit_resumption', 'upcoming_habit', 'sequence_suggestion', 'weekly_habit'
+  category    String
+  title       String
+  message     String
+  priority    String   // 'high', 'medium', 'low'
+  confidence  Float
+  timing      String   // 'immediate', 'upcoming', 'sequence', 'weekly'
+  actionType  String   // 'log_activity', 'prepare_activity', 'reminder'
+  isRead      Boolean  @default(false)
+  isActedOn   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  expiresAt   DateTime // Suggestions expire after some time
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+  @@index([expiresAt])
+  @@index([isRead])
 }
 
 // ============================================
