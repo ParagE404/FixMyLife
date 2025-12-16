@@ -184,39 +184,43 @@ const PatternSuggestions = ({ onSuggestionAction }) => {
         {suggestions.map((suggestion) => (
           <div
             key={suggestion.id}
-            className={`border-l-4 rounded-lg p-4 ${getPriorityStyles(suggestion.priority)}`}
+            className={`border-l-4 rounded-lg p-3 ${getPriorityStyles(suggestion.priority)}`}
           >
-            <div className="flex items-start justify-between">
-              <div className="flex items-start space-x-3 flex-1">
+            <div className="space-y-3">
+              {/* Header with icon and title */}
+              <div className="flex items-start space-x-2">
                 <div className="flex-shrink-0 mt-0.5">
                   {getSuggestionIcon(suggestion.type)}
                 </div>
                 
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center space-x-2 mb-1">
-                    <h4 className="text-sm font-medium text-gray-900">
+                  <div className="flex flex-col space-y-1 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-2">
+                    <h4 className="text-sm font-medium text-gray-900 break-words">
                       {suggestion.title}
                     </h4>
-                    <span className="text-xs px-2 py-1 rounded-full bg-white border">
+                    <span className="text-xs px-2 py-1 rounded-full bg-white border self-start">
                       {patternsService.formatSuggestionTiming(suggestion.timing)}
-                    </span>
-                  </div>
-                  
-                  <p className="text-sm text-gray-700 mb-2">
-                    {suggestion.message}
-                  </p>
-                  
-                  <div className="flex items-center space-x-2 text-xs text-gray-500">
-                    <span>Category: {suggestion.category}</span>
-                    <span>•</span>
-                    <span>
-                      Confidence: {Math.round(suggestion.confidence * 100)}%
                     </span>
                   </div>
                 </div>
               </div>
+              
+              {/* Message */}
+              <p className="text-sm text-gray-700 break-words">
+                {suggestion.message}
+              </p>
+              
+              {/* Metadata */}
+              <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500">
+                <span>Category: {suggestion.category}</span>
+                <span>•</span>
+                <span>
+                  Confidence: {Math.round(suggestion.confidence * 100)}%
+                </span>
+              </div>
 
-              <div className="flex items-center space-x-2 ml-4">
+              {/* Action buttons */}
+              <div className="flex items-center justify-between pt-2 border-t border-gray-200">
                 <button
                   onClick={() => handleActOnSuggestion(suggestion.id, suggestion)}
                   disabled={actioningId === suggestion.id}
@@ -227,15 +231,17 @@ const PatternSuggestions = ({ onSuggestionAction }) => {
                   ) : (
                     <Check className="w-3 h-3 mr-1" />
                   )}
-                  {getActionButtonText(suggestion.actionType)}
+                  <span className="hidden sm:inline">{getActionButtonText(suggestion.actionType)}</span>
+                  <span className="sm:hidden">Act</span>
                 </button>
                 
                 <button
                   onClick={() => handleDismissSuggestion(suggestion.id, suggestion)}
                   disabled={actioningId === suggestion.id}
-                  className="inline-flex items-center p-1.5 text-gray-400 hover:text-gray-600 disabled:opacity-50"
+                  className="inline-flex items-center px-2 py-1.5 text-xs text-gray-400 hover:text-gray-600 disabled:opacity-50"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-4 h-4 mr-1" />
+                  <span className="hidden sm:inline">Dismiss</span>
                 </button>
               </div>
             </div>

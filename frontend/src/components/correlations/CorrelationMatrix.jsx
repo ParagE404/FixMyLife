@@ -132,19 +132,19 @@ const CorrelationMatrix = () => {
 
       <div className="p-4">
         {/* Legend */}
-        <div className="mb-4 flex items-center justify-between">
-          <div className="flex items-center space-x-4 text-xs">
+        <div className="mb-4 flex flex-col space-y-2 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
+          <div className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-4 text-xs">
             <div className="flex items-center space-x-2">
-              <div className="w-4 h-4 rounded" style={{ backgroundColor: 'rgba(59, 130, 246, 0.8)' }}></div>
-              <span>Positive Correlation</span>
+              <div className="w-3 h-3 sm:w-4 sm:h-4 rounded" style={{ backgroundColor: 'rgba(59, 130, 246, 0.8)' }}></div>
+              <span>Positive</span>
             </div>
             <div className="flex items-center space-x-2">
-              <div className="w-4 h-4 rounded" style={{ backgroundColor: 'rgba(239, 68, 68, 0.8)' }}></div>
-              <span>Negative Correlation</span>
+              <div className="w-3 h-3 sm:w-4 sm:h-4 rounded" style={{ backgroundColor: 'rgba(239, 68, 68, 0.8)' }}></div>
+              <span>Negative</span>
             </div>
             <div className="flex items-center space-x-2">
-              <div className="w-4 h-4 rounded bg-gray-200"></div>
-              <span>No Correlation</span>
+              <div className="w-3 h-3 sm:w-4 sm:h-4 rounded bg-gray-200"></div>
+              <span>None</span>
             </div>
           </div>
           <div className="text-xs text-gray-500">
@@ -158,10 +158,10 @@ const CorrelationMatrix = () => {
             <table className="min-w-full">
               <thead>
                 <tr>
-                  <th className="w-32"></th>
+                  <th className="w-20 sm:w-32"></th>
                   {categories.map((category, index) => (
-                    <th key={index} className="p-1 text-xs font-medium text-gray-700 transform -rotate-45 origin-bottom-left h-20">
-                      <div className="w-16 truncate">
+                    <th key={index} className="p-0.5 sm:p-1 text-xs font-medium text-gray-700 transform -rotate-45 origin-bottom-left h-16 sm:h-20">
+                      <div className="w-12 sm:w-16 truncate">
                         {correlationsService.formatCategoryName(category)}
                       </div>
                     </th>
@@ -171,20 +171,20 @@ const CorrelationMatrix = () => {
               <tbody>
                 {categories.map((categoryA, rowIndex) => (
                   <tr key={rowIndex}>
-                    <td className="p-1 text-xs font-medium text-gray-700 w-32 truncate">
+                    <td className="p-0.5 sm:p-1 text-xs font-medium text-gray-700 w-20 sm:w-32 truncate">
                       {correlationsService.formatCategoryName(categoryA)}
                     </td>
                     {categories.map((categoryB, colIndex) => {
                       const coefficient = matrix[categoryA]?.[categoryB] || 0;
                       return (
-                        <td key={colIndex} className="p-1">
+                        <td key={colIndex} className="p-0.5 sm:p-1">
                           <div
-                            className={`w-8 h-8 rounded flex items-center justify-center text-xs font-medium ${getCellStyle(coefficient)}`}
+                            className={`w-6 h-6 sm:w-8 sm:h-8 rounded flex items-center justify-center text-xs font-medium ${getCellStyle(coefficient)}`}
                             style={{ backgroundColor: getCellColor(coefficient) }}
                             onClick={() => handleCellClick(categoryA, categoryB, coefficient)}
                             title={`${categoryA} ↔ ${categoryB}: ${correlationsService.formatCorrelationCoefficient(coefficient)}`}
                           >
-                            {coefficient === 1 ? '1' : coefficient !== 0 ? correlationsService.formatCorrelationCoefficient(coefficient).substring(0, 4) : ''}
+                            {coefficient === 1 ? '1' : coefficient !== 0 ? correlationsService.formatCorrelationCoefficient(coefficient).substring(0, 3) : ''}
                           </div>
                         </td>
                       );
@@ -230,7 +230,7 @@ const CorrelationMatrix = () => {
         {/* How to Read */}
         <div className="mt-4 p-3 bg-gray-50 rounded-lg">
           <div className="flex items-start space-x-2">
-            <Info className="w-4 h-4 text-gray-600 mt-0.5 flex-shrink-0" />
+            <Info className="w-4 h-4 text-gray-600 mt-0.5 shrink-0" />
             <div className="text-xs text-gray-600">
               <p className="font-medium mb-1">How to read the matrix:</p>
               <p>• Click on any cell to see correlation details</p>

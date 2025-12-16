@@ -92,40 +92,42 @@ const PredictiveInsights = () => {
       <div className="p-4 space-y-4">
         {predictions.length > 0 ? (
           predictions.map((prediction, index) => (
-            <div key={index} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-              <div className="flex items-start space-x-3">
-                <div className="flex-shrink-0 mt-0.5">
+            <div key={index} className="border rounded-lg p-3 sm:p-4 hover:shadow-md transition-shadow">
+              <div className="flex items-start space-x-2 sm:space-x-3">
+                <div className="shrink-0 mt-0.5">
                   {getPredictionIcon(prediction.type)}
                 </div>
                 
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-medium text-gray-900 flex items-center">
-                      <span className="text-lg mr-2">
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:justify-between sm:space-y-0 mb-2">
+                    <h4 className="font-medium text-gray-900 flex items-center text-sm sm:text-base">
+                      <span className="text-base sm:text-lg mr-2">
                         {getDirectionIcon(prediction.direction)}
                       </span>
-                      Prediction: {correlationsService.formatCategoryName(prediction.predicted)}
+                      <span className="break-words">
+                        Prediction: {correlationsService.formatCategoryName(prediction.predicted)}
+                      </span>
                     </h4>
                     
-                    <div className={`px-2 py-1 rounded text-xs font-medium border ${getConfidenceColor(prediction.confidence)}`}>
+                    <div className={`px-2 py-1 rounded text-xs font-medium border self-start ${getConfidenceColor(prediction.confidence)}`}>
                       {correlationsService.formatPredictionConfidence(prediction.confidence).text} Confidence
                     </div>
                   </div>
                   
                   <div className="mb-3">
-                    <p className="text-sm text-gray-700 mb-2">
+                    <p className="text-sm text-gray-700 mb-2 break-words">
                       {prediction.message}
                     </p>
                     
-                    <div className="flex items-center space-x-4 text-xs text-gray-500">
-                      <span>
+                    <div className="flex flex-col space-y-1 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-4 text-xs text-gray-500">
+                      <span className="break-words">
                         Trigger: {correlationsService.formatCategoryName(prediction.trigger)}
                       </span>
-                      <span>•</span>
+                      <span className="hidden sm:inline">•</span>
                       <span>
                         Direction: {prediction.direction === 'positive' ? 'Increases' : 'Decreases'}
                       </span>
-                      <span>•</span>
+                      <span className="hidden sm:inline">•</span>
                       <span>
                         Confidence: {Math.round(prediction.confidence * 100)}%
                       </span>
@@ -136,12 +138,12 @@ const PredictiveInsights = () => {
                   {prediction.recommendation && (
                     <div className="p-3 bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded">
                       <div className="flex items-start space-x-2">
-                        <Lightbulb className="w-4 h-4 text-purple-600 mt-0.5 flex-shrink-0" />
-                        <div>
+                        <Lightbulb className="w-4 h-4 text-purple-600 mt-0.5 shrink-0" />
+                        <div className="min-w-0">
                           <p className="text-sm font-medium text-purple-800 mb-1">
                             Recommendation
                           </p>
-                          <p className="text-sm text-purple-700">
+                          <p className="text-sm text-purple-700 break-words">
                             {prediction.recommendation}
                           </p>
                         </div>

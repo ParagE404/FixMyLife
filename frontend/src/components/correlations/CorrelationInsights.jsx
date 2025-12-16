@@ -93,21 +93,21 @@ const CorrelationInsights = () => {
       <div className="p-4 space-y-4">
         {/* Summary Stats */}
         {summary && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 p-3 sm:p-4 bg-gray-50 rounded-lg">
             <div className="text-center">
-              <div className="text-2xl font-bold text-gray-900">{summary.totalCorrelations}</div>
-              <div className="text-xs text-gray-600">Total Correlations</div>
+              <div className="text-lg sm:text-2xl font-bold text-gray-900">{summary.totalCorrelations}</div>
+              <div className="text-xs text-gray-600">Total</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">{summary.strongCorrelations}</div>
-              <div className="text-xs text-gray-600">Strong Correlations</div>
+              <div className="text-lg sm:text-2xl font-bold text-green-600">{summary.strongCorrelations}</div>
+              <div className="text-xs text-gray-600">Strong</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">{summary.insights}</div>
+              <div className="text-lg sm:text-2xl font-bold text-blue-600">{summary.insights}</div>
               <div className="text-xs text-gray-600">Insights</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-purple-600">{summary.dataPoints}</div>
+              <div className="text-lg sm:text-2xl font-bold text-purple-600">{summary.dataPoints}</div>
               <div className="text-xs text-gray-600">Data Points</div>
             </div>
           </div>
@@ -115,14 +115,14 @@ const CorrelationInsights = () => {
 
         {/* Top Correlation */}
         {summary?.topCorrelation && (
-          <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
-            <h4 className="font-medium text-gray-900 mb-2 flex items-center">
+          <div className="p-3 sm:p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
+            <h4 className="font-medium text-gray-900 mb-2 flex items-center text-sm sm:text-base">
               <TrendingUp className="w-4 h-4 mr-2 text-blue-600" />
               Strongest Correlation
             </h4>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-700">
+            <div className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
+              <div className="min-w-0">
+                <p className="text-sm text-gray-700 break-words">
                   {correlationsService.getCorrelationDescription(summary.topCorrelation)}
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
@@ -131,7 +131,7 @@ const CorrelationInsights = () => {
                   {summary.topCorrelation.significance}
                 </p>
               </div>
-              <div className={`px-2 py-1 rounded text-xs font-medium border ${correlationsService.getCorrelationBadgeColor(summary.topCorrelation.coefficient)}`}>
+              <div className={`px-2 py-1 rounded text-xs font-medium border self-start ${correlationsService.getCorrelationBadgeColor(summary.topCorrelation.coefficient)}`}>
                 {summary.topCorrelation.strength}
               </div>
             </div>
@@ -141,18 +141,18 @@ const CorrelationInsights = () => {
         {/* Insights */}
         {insights.length > 0 ? (
           insights.map((insight, index) => (
-            <div key={index} className="border rounded-lg p-4">
-              <div className="flex items-start space-x-3">
-                <div className="flex-shrink-0 mt-0.5">
+            <div key={index} className="border rounded-lg p-3 sm:p-4">
+              <div className="flex items-start space-x-2 sm:space-x-3">
+                <div className="shrink-0 mt-0.5">
                   {getInsightIcon(insight.type)}
                 </div>
                 
-                <div className="flex-1">
-                  <h4 className="font-medium text-gray-900 mb-1">
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-medium text-gray-900 mb-1 text-sm sm:text-base break-words">
                     {insight.title}
                   </h4>
                   
-                  <p className="text-sm text-gray-700 mb-3">
+                  <p className="text-sm text-gray-700 mb-3 break-words">
                     {insight.description}
                   </p>
 
@@ -160,18 +160,18 @@ const CorrelationInsights = () => {
                   {insight.correlations && insight.correlations.length > 0 && (
                     <div className="space-y-2">
                       {insight.correlations.slice(0, 3).map((correlation, idx) => (
-                        <div key={idx} className="flex items-center justify-between text-sm p-2 bg-gray-50 rounded">
-                          <div className="flex items-center space-x-2">
-                            <span className="text-lg">
+                        <div key={idx} className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:justify-between sm:space-y-0 text-sm p-2 bg-gray-50 rounded">
+                          <div className="flex items-center space-x-2 min-w-0">
+                            <span className="text-base sm:text-lg">
                               {correlationsService.getCorrelationDirectionIcon(correlation.coefficient)}
                             </span>
-                            <span className="text-gray-700">
+                            <span className="text-gray-700 break-words">
                               {correlationsService.formatCategoryName(correlation.categoryA)}
                               {' ↔ '}
                               {correlationsService.formatCategoryName(correlation.categoryB)}
                             </span>
                           </div>
-                          <div className="flex items-center space-x-2">
+                          <div className="flex items-center space-x-2 self-start">
                             <span className={`font-medium ${correlationsService.getCorrelationStrengthColor(correlation.coefficient)}`}>
                               {correlationsService.formatCorrelationCoefficient(correlation.coefficient)}
                             </span>
@@ -187,7 +187,7 @@ const CorrelationInsights = () => {
                   {/* Actionable recommendations */}
                   {insight.actionable && insight.correlations && (
                     <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded">
-                      <p className="text-sm text-blue-800">
+                      <p className="text-sm text-blue-800 break-words">
                         <strong>💡 Recommendation:</strong> {correlationsService.generateCorrelationRecommendation(insight.correlations[0])}
                       </p>
                     </div>

@@ -111,29 +111,31 @@ const CorrelationWidget = () => {
       {/* Top Correlations */}
       <div className="space-y-2">
         {topCorrelations.map((correlation, index) => (
-          <div key={index} className="p-3 bg-gray-50 rounded-lg">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2 flex-1">
-                <div className="text-lg">
+          <div key={index} className="p-2 bg-gray-50 rounded-lg">
+            <div className="flex flex-col space-y-2">
+              <div className="flex items-center space-x-2">
+                <div className="flex-shrink-0">
                   {correlation.direction === 'positive' ? 
                     <TrendingUp className="w-4 h-4 text-green-600" /> : 
                     <TrendingDown className="w-4 h-4 text-red-600" />
                   }
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm font-medium text-gray-900 truncate">
+                  <div className="text-sm font-medium text-gray-900 break-words">
                     {correlationsService.formatCategoryName(correlation.categoryA)}
                     {' ↔ '}
                     {correlationsService.formatCategoryName(correlation.categoryB)}
                   </div>
-                  <div className="text-xs text-gray-500">
-                    {correlation.strength} correlation
-                  </div>
                 </div>
               </div>
               
-              <div className={`px-2 py-1 rounded text-xs font-medium border ${correlationsService.getCorrelationBadgeColor(correlation.coefficient)}`}>
-                {correlationsService.formatCorrelationCoefficient(correlation.coefficient)}
+              <div className="flex items-center justify-between">
+                <div className="text-xs text-gray-500">
+                  {correlation.strength} correlation
+                </div>
+                <div className={`px-2 py-1 rounded text-xs font-medium border ${correlationsService.getCorrelationBadgeColor(correlation.coefficient)}`}>
+                  {correlationsService.formatCorrelationCoefficient(correlation.coefficient)}
+                </div>
               </div>
             </div>
           </div>
