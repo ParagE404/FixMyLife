@@ -8,7 +8,7 @@ const getAuthHeaders = (token) => ({
 // Get token from auth store
 const getToken = () => {
   const authStore = JSON.parse(localStorage.getItem('auth-store') || '{}');
-  return authStore?.state?.token;
+  return authStore?.state?.token || authStore?.token;
 };
 
 class ApiService {
@@ -51,6 +51,21 @@ class ApiService {
       method: 'PUT',
       headers: getAuthHeaders(token),
       body: JSON.stringify(data),
+    });
+    
+    if (!response.ok) {
+      throw new Error(`API Error: ${response.status} ${response.statusText}`);
+    }
+    
+    return response.json();
+  }
+
+  async patch(endpoint, data = null) {
+    const token = getToken();
+    const response = await fetch(`${API_URL}${endpoint}`, {
+      method: 'PATCH',
+      headers: getAuthHeaders(token),
+      body: data ? JSON.stringify(data) : null,
     });
     
     if (!response.ok) {

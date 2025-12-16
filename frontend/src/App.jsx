@@ -14,6 +14,7 @@ import { ProfilePage } from './pages/ProfilePage';
 import { SettingsPage } from './pages/SettingsPage';
 import PatternsPage from './pages/PatternsPage.jsx';
 import CorrelationsPage from './pages/CorrelationsPage.jsx';
+import AlertsPage from './pages/AlertsPage.jsx';
 
 function AppContent() {
   const location = useLocation();
@@ -77,6 +78,14 @@ function AppContent() {
           element={
             <PrivateRoute>
               <CorrelationsPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/alerts"
+          element={
+            <PrivateRoute>
+              <AlertsPage />
             </PrivateRoute>
           }
         />

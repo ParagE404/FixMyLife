@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import PatternSuggestionsWidget from '../components/patterns/PatternSuggestionsWidget.jsx';
 import CorrelationWidget from '../components/correlations/CorrelationWidget.jsx';
+import RiskAnalysisWidget from '../components/alerts/RiskAnalysisWidget.jsx';
 
 export function DashboardPage() {
   const { token } = useAuthStore();
@@ -151,6 +152,9 @@ export function DashboardPage() {
             <WeeklyProgressBars data={weeklyData?.chartData || []} />
           </CardContent>
         </Card>
+
+        {/* Risk Analysis Widget */}
+        <RiskAnalysisWidget />
 
         {/* Pattern Suggestions Widget */}
         <PatternSuggestionsWidget />

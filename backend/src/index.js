@@ -8,8 +8,10 @@ import analyticsRoutes from './routes/analytics.routes.js';
 import goalsRoutes from './routes/goals.routes.js';
 import patternsRoutes from './routes/patterns.routes.js';
 import correlationsRoutes from './routes/correlations.routes.js';
+import predictionRoutes from './routes/prediction.routes.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { initializePatternScheduler } from './services/pattern-job.service.js';
+import { initializePredictionScheduler } from './services/prediction-job.service.js';
 
 const app = express();
 
@@ -31,6 +33,7 @@ app.use('/api/analytics', analyticsRoutes);
 app.use('/api/goals', goalsRoutes);
 app.use('/api/patterns', patternsRoutes);
 app.use('/api/correlations', correlationsRoutes);
+app.use('/api/predictions', predictionRoutes);
 
 // 404 handler
 app.use((req, res) => {
@@ -47,4 +50,7 @@ app.listen(config.port, () => {
   
   // Initialize pattern recognition scheduler
   initializePatternScheduler();
+  
+  // Initialize prediction scheduler
+  initializePredictionScheduler();
 });
