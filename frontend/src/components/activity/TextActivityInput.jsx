@@ -153,7 +153,7 @@ export function TextActivityInput({ onActivitiesCreated }) {
                     </Label>
                     <Input
                       id={`cat-${idx}`}
-                      value={activity.category.name}
+                      value={activity.category?.name || activity.customCategory?.name || 'Unknown'}
                       onChange={(e) => handleEdit(idx, "category", e.target.value)}
                     />
                   </div>

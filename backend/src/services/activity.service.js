@@ -126,7 +126,7 @@ export const createActivity = async (userId, activityData) => {
     const { description, categoryId, customCategoryId, startTime, endTime } = activityData;
 
     if (!categoryId && !customCategoryId) {
-      throwError('Category is required', 400);
+      throwError('Either category or custom category is required', 400);
     }
 
     let start = startTime ? new Date(startTime) : new Date();
@@ -377,7 +377,7 @@ async function updateActivitySuggestion(userId, description, categoryId) {
         data: {
           userId,
           description,
-          categoryId,
+          categoryId: categoryId || null,
           frequency: 1,
           lastUsed: new Date(),
         },
