@@ -21,7 +21,7 @@ export function MobileWrapper({ children }) {
 
   if (isMobile === null) return null;
 
-  if (!isMobile) {
+  if (false) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-background p-4">
         <Card className="max-w-md">

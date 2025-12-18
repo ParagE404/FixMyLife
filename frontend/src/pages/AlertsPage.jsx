@@ -5,7 +5,7 @@ import RiskAnalysisDashboard from '../components/analytics/RiskAnalysisDashboard
 
 const AlertsPage = () => {
   return (
-    <div className="min-h-screen bg-gray-50 p-4 pb-24">
+    <div className="min-h-screen bg-gray-50 p-4 pb-30">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
         <div className="bg-white rounded-lg shadow-sm border p-6">

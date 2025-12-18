@@ -56,7 +56,7 @@ export function MobileNav() {
       {/* More Menu Overlay */}
       {showMoreMenu && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-60 z-40 md:hidden animate-in fade-in duration-200" 
+          className="fixed inset-0 bg-black bg-opacity-60 z-40 animate-in fade-in duration-200" 
           onClick={() => setShowMoreMenu(false)}
         >
           <div className="fixed bottom-20 left-4 right-4 animate-in slide-in-from-bottom-4 duration-300">
@@ -162,7 +162,7 @@ export function MobileNav() {
       )}
 
       {/* Main Navigation */}
-      <Card className="fixed bottom-4 left-4 right-4 md:hidden border-0 shadow-xl glass card-elevated">
+      <Card className="fixed bottom-4 left-4 right-4 border-0 shadow-xl glass card-elevated">
         <div className="grid grid-cols-5 gap-1 p-2">
           {mainNavItems.map((item) => {
             const IconComponent = item.icon;

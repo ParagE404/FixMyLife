@@ -16,8 +16,8 @@ export function ActivityPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background p-4 pb-24">
-      <div className="max-w-2xl mx-auto space-y-6 animate-fade-in">
+    <div className="min-h-screen bg-background p-4 pb-30">
+      <div className="max-w-6xl mx-auto space-y-6 animate-fade-in">
         {/* Header */}
         <Card className="glass card-elevated">
           <CardHeader>
