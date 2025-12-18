@@ -1,8 +1,8 @@
 {
-  "name": "habit-formation-backend",
+  "name": "fixmylife-backend",
   "version": "1.0.0",
   "type": "module",
-  "description": "AI Habit Formation App Backend",
+  "description": "FixMyLife - AI Habit Formation App Backend",
   "main": "src/index.js",
   "scripts": {
     "dev": "nodemon src/index.js",

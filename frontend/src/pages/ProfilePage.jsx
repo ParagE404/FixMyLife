@@ -154,7 +154,7 @@ export function ProfilePage() {
               </div>
               <div className="space-y-1">
                 <p className="text-sm text-muted-foreground">App Name</p>
-                <Badge variant="outline">Habit Tracker</Badge>
+                <Badge variant="outline">Fix My Life</Badge>
               </div>
             </div>
             
