@@ -34,7 +34,7 @@ export function LoginForm() {
             Welcome back
           </CardTitle>
           <CardDescription>
-            Sign in to your Habit Tracker account
+            Sign in to your FixMyLife account
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
