@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { throwError } from "../middleware/errorHandler.js";
 import { createInsight } from "./recommendations.service.js";
+import redisService from './redis.service.js';
 
 const prisma = new PrismaClient();
 
@@ -31,6 +32,10 @@ export const createGoal = async (userId, goalData) => {
         progress: true,
       },
     });
+
+    // Invalidate user's cache after creating goal
+    await redisService.invalidateUserCache(userId);
+    console.log('🗑️ User cache invalidated after goal creation');
 
     return goal;
   } catch (error) {

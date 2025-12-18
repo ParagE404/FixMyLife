@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { throwError } from '../middleware/errorHandler.js';
+import redisService from './redis.service.js';
 
 const prisma = new PrismaClient();
 
@@ -15,6 +16,14 @@ const getActivityDuration = (activity) => {
 // Get weekly summary for current week
 export const getWeeklySummary = async (userId) => {
   try {
+    // Check cache first
+    const cacheKey = redisService.getAnalyticsKey(userId, 'weekly');
+    const cached = await redisService.get(cacheKey);
+    if (cached) {
+      console.log('📦 Weekly summary served from cache');
+      return cached;
+    }
+
     const today = new Date();
     const startOfWeek = new Date(today);
     startOfWeek.setDate(today.getDate() - today.getDay()); // Sunday
@@ -68,12 +77,18 @@ export const getWeeklySummary = async (userId) => {
       });
     }
 
-    return {
+    const result = {
       chartData,
       categoryTotals,
       totalHours: Object.values(dailyBreakdown).reduce((a, b) => a + b, 0),
       activityCount: activities.length,
     };
+
+    // Cache for 1 hour (3600 seconds)
+    await redisService.set(cacheKey, result, 3600);
+    console.log('💾 Weekly summary cached');
+
+    return result;
   } catch (error) {
     console.error('Weekly summary error:', error);
     throw error;
@@ -83,6 +98,14 @@ export const getWeeklySummary = async (userId) => {
 // Get category breakdown
 export const getCategoryBreakdown = async (userId, days = 7) => {
   try {
+    // Check cache first
+    const cacheKey = redisService.getAnalyticsKey(userId, 'category', days);
+    const cached = await redisService.get(cacheKey);
+    if (cached) {
+      console.log('📦 Category breakdown served from cache');
+      return cached;
+    }
+
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
     startDate.setHours(0, 0, 0, 0);
@@ -118,7 +141,13 @@ export const getCategoryBreakdown = async (userId, days = 7) => {
       categoryData[catName].count += 1;
     });
 
-    return Object.values(categoryData).sort((a, b) => b.hours - a.hours);
+    const result = Object.values(categoryData).sort((a, b) => b.hours - a.hours);
+
+    // Cache for 2 hours
+    await redisService.set(cacheKey, result, 7200);
+    console.log('💾 Category breakdown cached');
+
+    return result;
   } catch (error) {
     console.error('Category breakdown error:', error);
     throw error;
@@ -302,6 +331,14 @@ export const getActivityHistory = async (userId, filters = {}) => {
 // Get habit strength (consistency score)
 export const getHabitStrength = async (userId) => {
   try {
+    // Check cache first
+    const cacheKey = redisService.getAnalyticsKey(userId, 'habit-strength');
+    const cached = await redisService.get(cacheKey);
+    if (cached) {
+      console.log('📦 Habit strength served from cache');
+      return cached;
+    }
+
     const today = new Date();
     const thirtyDaysAgo = new Date(today);
     thirtyDaysAgo.setDate(today.getDate() - 30);
@@ -343,7 +380,7 @@ export const getHabitStrength = async (userId) => {
     const totalActivities = Object.values(dailyData).reduce((sum, day) => sum + (day.activities || 0), 0);
     const avgActivitiesPerDay = totalActivities / 30;
 
-    return {
+    const result = {
       consistencyScore: Math.round(consistencyScore),
       daysWithActivity,
       totalDays: 30,
@@ -351,6 +388,12 @@ export const getHabitStrength = async (userId) => {
       avgActivitiesPerDay: parseFloat(avgActivitiesPerDay.toFixed(1)),
       level: getHabitLevel(consistencyScore),
     };
+
+    // Cache for 4 hours
+    await redisService.set(cacheKey, result, 14400);
+    console.log('💾 Habit strength cached');
+
+    return result;
   } catch (error) {
     console.error('Habit strength error:', error);
     throw error;

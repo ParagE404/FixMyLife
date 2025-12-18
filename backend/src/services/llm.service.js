@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { config } from '../config.js';
 import { throwError } from '../middleware/errorHandler.js';
+import redisService from './redis.service.js';
 
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
@@ -20,6 +21,14 @@ export const parseActivityWithLLM = async (userInput, customCategories = []) => 
     ];
 
     const allCategories = [...defaultCategories, ...customCategories];
+
+    // Check cache first - cache based on input and available categories
+    const cacheKey = redisService.getLLMKey(userInput, allCategories);
+    const cached = await redisService.get(cacheKey);
+    if (cached) {
+      console.log('📦 LLM parsing served from cache');
+      return cached;
+    }
 
     const systemPrompt = `You are an activity parsing assistant. Parse the user's activity description into discrete activities with categories and times.
 
@@ -86,7 +95,16 @@ Output: [
       }
     }
 
-    return Array.isArray(parsedActivities) ? parsedActivities : [];
+    const result = Array.isArray(parsedActivities) ? parsedActivities : [];
+
+    // Cache successful results for 24 hours (86400 seconds)
+    // Similar inputs will likely have similar outputs
+    if (result.length > 0) {
+      await redisService.set(cacheKey, result, 86400);
+      console.log('💾 LLM parsing result cached');
+    }
+
+    return result;
   } catch (error) {
     console.error('🔴 LLM Error Details:', {
       message: error.message,

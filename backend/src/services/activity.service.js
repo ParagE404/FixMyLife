@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { parseActivityWithLLM } from './llm.service.js';
 import { throwError } from '../middleware/errorHandler.js';
+import redisService from './redis.service.js';
 
 const prisma = new PrismaClient();
 
@@ -114,6 +115,10 @@ export const parseAndCreateActivities = async (userId, textInput) => {
       createdActivities.push(activity);
     }
 
+    // Invalidate user's cache after creating activities
+    await redisService.invalidateUserCache(userId);
+    console.log('🗑️ User cache invalidated after activity creation');
+
     return createdActivities;
   } catch (error) {
     console.error('Activity creation error:', error);
@@ -183,6 +188,10 @@ export const createActivity = async (userId, activityData) => {
 
     // Update goal progress for matching categories
     await updateGoalProgressFromActivity(userId, categoryId, customCategoryId, duration);
+
+    // Invalidate user's cache after creating activity
+    await redisService.invalidateUserCache(userId);
+    console.log('🗑️ User cache invalidated after activity creation');
 
     return activity;
   } catch (error) {
@@ -309,6 +318,10 @@ export const updateActivity = async (userId, activityId, updates) => {
     },
   });
 
+  // Invalidate user's cache after updating activity
+  await redisService.invalidateUserCache(userId);
+  console.log('🗑️ User cache invalidated after activity update');
+
   return updated;
 };
 
@@ -322,12 +335,25 @@ export const deleteActivity = async (userId, activityId) => {
   }
 
   await prisma.activity.delete({ where: { id: activityId } });
+  
+  // Invalidate user's cache after deleting activity
+  await redisService.invalidateUserCache(userId);
+  console.log('🗑️ User cache invalidated after activity deletion');
+  
   return { success: true };
 };
 
 export const getActivitySuggestions = async (userId, query) => {
   if (!query || query.length < 2) {
     return [];
+  }
+
+  // Check cache first
+  const cacheKey = redisService.getActivitySuggestionsKey(userId, query);
+  const cached = await redisService.get(cacheKey);
+  if (cached) {
+    console.log('📦 Activity suggestions served from cache');
+    return cached;
   }
 
   const suggestions = await prisma.activitySuggestion.findMany({
@@ -340,6 +366,10 @@ export const getActivitySuggestions = async (userId, query) => {
     orderBy: { frequency: 'desc' },
     take: 5,
   });
+
+  // Cache for 30 minutes
+  await redisService.set(cacheKey, suggestions, 1800);
+  console.log('💾 Activity suggestions cached');
 
   return suggestions;
 };

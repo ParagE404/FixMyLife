@@ -1,9 +1,18 @@
 import { PrismaClient } from '@prisma/client';
+import redisService from './redis.service.js';
 
 const prisma = new PrismaClient();
 
 export const generateRecommendations = async (userId) => {
   try {
+    // Check cache first
+    const cacheKey = redisService.getRecommendationsKey(userId);
+    const cached = await redisService.get(cacheKey);
+    if (cached) {
+      console.log('📦 Recommendations served from cache');
+      return cached;
+    }
+
     const recommendations = [];
 
     // 1. Get user's activity data
@@ -121,6 +130,10 @@ export const generateRecommendations = async (userId) => {
         priority: 'low',
       });
     }
+
+    // Cache recommendations for 2 hours
+    await redisService.set(cacheKey, recommendations, 7200);
+    console.log('💾 Recommendations cached');
 
     return recommendations;
   } catch (error) {

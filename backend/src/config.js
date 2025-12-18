@@ -17,4 +17,8 @@ export const config = {
   groq: {
     apiKey: process.env.GROQ_API_KEY,
   },
+  redis: {
+    url: process.env.REDIS_URL || 'redis://localhost:6379',
+    enabled: process.env.REDIS_ENABLED !== 'false', // Default to enabled
+  },
 };

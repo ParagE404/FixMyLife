@@ -9,9 +9,11 @@ import goalsRoutes from './routes/goals.routes.js';
 import patternsRoutes from './routes/patterns.routes.js';
 import correlationsRoutes from './routes/correlations.routes.js';
 import predictionRoutes from './routes/prediction.routes.js';
+import cacheRoutes from './routes/cache.routes.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { initializePatternScheduler } from './services/pattern-job.service.js';
 import { initializePredictionScheduler } from './services/prediction-job.service.js';
+import redisService from './services/redis.service.js';
 
 const app = express();
 
@@ -21,8 +23,38 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Health check
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+app.get('/health', async (req, res) => {
+  const redisHealth = await redisService.ping();
+  
+  // Get basic Redis info if connected
+  let redisInfo = null;
+  if (redisHealth && redisService.client) {
+    try {
+      const info = await redisService.client.info('memory');
+      const lines = info.split('\r\n');
+      const memoryInfo = {};
+      lines.forEach(line => {
+        if (line.includes(':')) {
+          const [key, value] = line.split(':');
+          if (key.includes('memory') || key.includes('keys')) {
+            memoryInfo[key] = value;
+          }
+        }
+      });
+      redisInfo = memoryInfo;
+    } catch (error) {
+      console.error('Redis info error:', error);
+    }
+  }
+  
+  res.json({ 
+    status: 'ok', 
+    timestamp: new Date().toISOString(),
+    redis: {
+      connected: redisHealth,
+      info: redisInfo
+    }
+  });
 });
 
 // Routes
@@ -34,6 +66,7 @@ app.use('/api/goals', goalsRoutes);
 app.use('/api/patterns', patternsRoutes);
 app.use('/api/correlations', correlationsRoutes);
 app.use('/api/predictions', predictionRoutes);
+app.use('/api/cache', cacheRoutes);
 
 // 404 handler
 app.use((req, res) => {
@@ -43,10 +76,20 @@ app.use((req, res) => {
 // Error handler (must be last)
 app.use(errorHandler);
 
+// Initialize Redis
+async function initializeServer() {
+  if (config.redis.enabled) {
+    await redisService.connect();
+  }
+}
+
 // Start server
-app.listen(config.port, () => {
+app.listen(config.port, async () => {
   console.log(`✅ Server running on http://localhost:${config.port}`);
   console.log(`📊 Prisma Studio: npx prisma studio`);
+  
+  // Initialize Redis
+  await initializeServer();
   
   // Initialize pattern recognition scheduler
   initializePatternScheduler();
