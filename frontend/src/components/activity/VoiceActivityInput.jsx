@@ -37,7 +37,7 @@ export function VoiceActivityInput({ onActivitiesCreated }) {
     }
 
     const recognition = new SpeechRecognition();
-    recognition.continuous = true;
+    recognition.continuous = false;
     recognition.interimResults = true;
     recognition.lang = 'en-US';
 
@@ -47,18 +47,18 @@ export function VoiceActivityInput({ onActivitiesCreated }) {
     };
 
     recognition.onresult = (event) => {
+      let finalTranscript = '';
+    
       for (let i = event.resultIndex; i < event.results.length; i++) {
-        const transcript = event.results[i].transcript;
-        if (event.results[i].isFinal) {
-          setTranscript((prev) => prev + transcript + ' ');
+        const result = event.results[i];
+        if (result.isFinal) {
+          finalTranscript += result[0].transcript + ' ';
         }
       }
-
-      // Reset silence timeout on each result
-      clearTimeout(silenceTimeoutRef.current);
-      silenceTimeoutRef.current = setTimeout(() => {
-        recognition.stop();
-      }, 3000); // Stop after 3 seconds of silence
+    
+      if (finalTranscript) {
+        setTranscript(prev => prev + finalTranscript);
+      }
     };
 
     recognition.onerror = (event) => {
