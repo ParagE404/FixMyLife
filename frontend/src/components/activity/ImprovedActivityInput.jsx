@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 
 export function ImprovedActivityInput({ onActivitiesCreated }) {
-  const [activeTab, setActiveTab] = useState('quick');
+  const [activeTab, setActiveTab] = useState('text');
 
   const handleActivitiesCreated = (activities) => {
     if (onActivitiesCreated) {
@@ -29,14 +29,6 @@ export function ImprovedActivityInput({ onActivitiesCreated }) {
         <CardContent className="p-6">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="quick" className="flex items-center gap-2">
-                <Zap className="w-4 h-4" />
-                <span className="hidden sm:inline">Quick</span>
-              </TabsTrigger>
-              <TabsTrigger value="smart" className="flex items-center gap-2">
-                <Lightbulb className="w-4 h-4" />
-                <span className="hidden sm:inline">Smart</span>
-              </TabsTrigger>
               <TabsTrigger value="text" className="flex items-center gap-2">
                 <PenTool className="w-4 h-4" />
                 <span className="hidden sm:inline">Text</span>
@@ -45,37 +37,15 @@ export function ImprovedActivityInput({ onActivitiesCreated }) {
                 <Mic className="w-4 h-4" />
                 <span className="hidden sm:inline">Voice</span>
               </TabsTrigger>
+              <TabsTrigger value="quick" className="flex items-center gap-2">
+                <Zap className="w-4 h-4" />
+                <span className="hidden sm:inline">Quick</span>
+              </TabsTrigger>
+              <TabsTrigger value="smart" className="flex items-center gap-2">
+                <Lightbulb className="w-4 h-4" />
+                <span className="hidden sm:inline">Smart</span>
+              </TabsTrigger>
             </TabsList>
-            
-            <TabsContent value="quick" className="mt-6">
-              <div className="space-y-4">
-                <div className="text-center">
-                  <h3 className="font-semibold text-lg flex items-center justify-center gap-2">
-                    <Zap className="w-5 h-5 text-primary" />
-                    Quick Entry
-                  </h3>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Instantly log activities with one tap
-                  </p>
-                </div>
-                <QuickActivityEntry onActivityCreated={handleActivitiesCreated} />
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="smart" className="mt-6">
-              <div className="space-y-4">
-                <div className="text-center">
-                  <h3 className="font-semibold text-lg flex items-center justify-center gap-2">
-                    <Sparkles className="w-5 h-5 text-primary" />
-                    Smart Suggestions
-                  </h3>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    AI-powered suggestions based on your patterns
-                  </p>
-                </div>
-                <SmartSuggestions onActivitySelected={handleActivitiesCreated} />
-              </div>
-            </TabsContent>
             
             <TabsContent value="text" className="mt-6">
               <div className="space-y-4">
@@ -104,6 +74,36 @@ export function ImprovedActivityInput({ onActivitiesCreated }) {
                   </p>
                 </div>
                 <VoiceActivityInput onActivitiesCreated={handleActivitiesCreated} />
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="quick" className="mt-6">
+              <div className="space-y-4">
+                <div className="text-center">
+                  <h3 className="font-semibold text-lg flex items-center justify-center gap-2">
+                    <Zap className="w-5 h-5 text-primary" />
+                    Quick Entry
+                  </h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Instantly log activities with one tap
+                  </p>
+                </div>
+                <QuickActivityEntry onActivityCreated={handleActivitiesCreated} />
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="smart" className="mt-6">
+              <div className="space-y-4">
+                <div className="text-center">
+                  <h3 className="font-semibold text-lg flex items-center justify-center gap-2">
+                    <Sparkles className="w-5 h-5 text-primary" />
+                    Smart Suggestions
+                  </h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    AI-powered suggestions based on your patterns
+                  </p>
+                </div>
+                <SmartSuggestions onActivitySelected={handleActivitiesCreated} />
               </div>
             </TabsContent>
           </Tabs>
