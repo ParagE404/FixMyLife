@@ -6,6 +6,27 @@ const getAuthHeaders = (token) => ({
 });
 
 export const activityService = {
+  // Transcribe audio to text using Whisper
+  transcribeAudio: async (audioBlob, token) => {
+    const formData = new FormData();
+    formData.append('audio', audioBlob, 'recording.webm');
+
+    const response = await fetch(`${API_URL}/activities/transcribe`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to transcribe audio');
+    }
+
+    return response.json();
+  },
+
   // Parse and create activities from text
   parseActivities: async (input, token) => {
     const response = await fetch(`${API_URL}/activities`, {
