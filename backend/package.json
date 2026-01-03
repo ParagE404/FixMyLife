@@ -10,6 +10,7 @@
     "migrate": "prisma migrate dev",
     "studio": "prisma studio",
     "seed": "node src/scripts/seed.js",
+    "seed:demo": "node src/scripts/seed-demo-user.js",
     "test:redis": "node test-redis.js"
   },
   "keywords": [],
