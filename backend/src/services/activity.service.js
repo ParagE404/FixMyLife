@@ -1,9 +1,20 @@
 import { PrismaClient } from '@prisma/client';
-import { parseActivityWithLLM } from './llm.service.js';
+import { parseActivityWithLLM, transcribeAudioWithWhisper } from './llm.service.js';
 import { throwError } from '../middleware/errorHandler.js';
 import redisService from './redis.service.js';
 
 const prisma = new PrismaClient();
+
+// Transcribe audio using Whisper
+export const transcribeAudio = async (audioBuffer, mimeType) => {
+  try {
+    const transcript = await transcribeAudioWithWhisper(audioBuffer, mimeType);
+    return transcript;
+  } catch (error) {
+    console.error('Transcription error:', error);
+    throwError('Failed to transcribe audio', 500);
+  }
+};
 
 export const parseAndCreateActivities = async (userId, textInput) => {
   try {

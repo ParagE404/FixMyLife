@@ -1,9 +1,63 @@
 import axios from 'axios';
+import FormData from 'form-data';
 import { config } from '../config.js';
 import { throwError } from '../middleware/errorHandler.js';
 import redisService from './redis.service.js';
 
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
+const GROQ_AUDIO_URL = 'https://api.groq.com/openai/v1/audio/transcriptions';
+
+// Transcribe audio using Groq's Whisper
+export const transcribeAudioWithWhisper = async (audioBuffer, mimeType) => {
+  try {
+    if (!config.groq.apiKey) {
+      throwError('Groq API key not configured', 500);
+    }
+
+    // Determine file extension from mime type
+    const extMap = {
+      'audio/webm': 'webm',
+      'audio/mp4': 'mp4',
+      'audio/mpeg': 'mp3',
+      'audio/wav': 'wav',
+      'audio/ogg': 'ogg',
+      'audio/flac': 'flac',
+    };
+    const ext = extMap[mimeType] || 'webm';
+
+    // Create form data
+    const formData = new FormData();
+    formData.append('file', audioBuffer, {
+      filename: `audio.${ext}`,
+      contentType: mimeType,
+    });
+    formData.append('model', 'whisper-large-v3');
+    formData.append('language', 'en');
+    formData.append('response_format', 'json');
+
+    console.log('🎤 Sending audio to Groq Whisper API...');
+
+    const response = await axios.post(GROQ_AUDIO_URL, formData, {
+      headers: {
+        'Authorization': `Bearer ${config.groq.apiKey}`,
+        ...formData.getHeaders(),
+      },
+      timeout: 30000,
+      maxContentLength: 25 * 1024 * 1024,
+      maxBodyLength: 25 * 1024 * 1024,
+    });
+
+    console.log('✅ Whisper transcription received');
+    return response.data.text || '';
+  } catch (error) {
+    console.error('🔴 Whisper Error:', {
+      message: error.message,
+      status: error.response?.status,
+      data: error.response?.data,
+    });
+    throwError('Failed to transcribe audio', 500);
+  }
+};
 
 export const parseActivityWithLLM = async (userInput, customCategories = []) => {
   try {

@@ -1,4 +1,5 @@
 import express from 'express';
+import multer from 'multer';
 import { authenticateUser } from '../middleware/auth.js';
 import {
   parseAndCreateActivities,
@@ -7,9 +8,30 @@ import {
   updateActivity,
   deleteActivity,
   getActivitySuggestions,
+  transcribeAudio,
 } from '../services/activity.service.js';
 
 const router = express.Router();
+
+// Configure multer for audio file uploads
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 25 * 1024 * 1024 }, // 25MB limit
+});
+
+// Transcribe audio to text
+router.post('/transcribe', authenticateUser, upload.single('audio'), async (req, res, next) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'Audio file is required' });
+    }
+
+    const transcript = await transcribeAudio(req.file.buffer, req.file.mimetype);
+    res.json({ transcript });
+  } catch (error) {
+    next(error);
+  }
+});
 
 // Parse and create activities from text
 router.post('/', authenticateUser, async (req, res, next) => {
